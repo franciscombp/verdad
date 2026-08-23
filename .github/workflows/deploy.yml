@@ -1,0 +1,74 @@
+# ============================================================================
+# Despliegue automático a GitHub Pages
+# ============================================================================
+# Cada push a `main` publica el repositorio tal cual. No hay compilación y no
+# la va a haber: el juego es HTML, CSS y módulos ES, y el sistema de diseño
+# viaja como copia literal en `ds/`. Lo que se sube es byte a byte lo que hay
+# en `main`, que es también lo que se ve al abrir `index.html` con dos clics.
+#
+# REQUISITO DE CONFIGURACIÓN (una sola vez, a mano):
+#   Settings → Pages → Source: "GitHub Actions"
+# Sin ese paso el workflow corre pero no publica nada.
+# ============================================================================
+
+name: Desplegar a GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Permite lanzarlo a mano desde la pestaña Actions.
+  workflow_dispatch:
+
+# Permisos mínimos que necesita el despliegue.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se empujan dos commits seguidos, cancelamos el despliegue anterior:
+# solo interesa publicar el último.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    name: Revisar los datos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No hay dependencias que instalar: el corrector es un módulo ES suelto.
+      # Comprueba que las marcas existen en el texto, que ningún día pide más
+      # censuras de las que hay y que las contradicciones están donde deben.
+      - name: Corregir pruebas
+        run: node herramientas/revisar.mjs
+
+  desplegar:
+    name: Desplegar
+    needs: revisar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Publicar en GitHub Pages
+        id: despliegue
+        uses: actions/deploy-pages@v4

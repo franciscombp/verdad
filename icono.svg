@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EL CENSOR">
+  <!-- La mesa del censor y, encima, una barra de tinta tapando una línea de
+       texto. Es el gesto entero del juego en 64 píxeles. -->
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <rect x="12" y="14" width="40" height="36" fill="#f5f2ea"/>
+  <rect x="18" y="21" width="28" height="3" fill="#141414"/>
+  <rect x="18" y="28" width="20" height="2" fill="#9a9a9a"/>
+  <rect x="14" y="33" width="36" height="7" fill="#c53b2b"/>
+  <rect x="18" y="44" width="24" height="2" fill="#9a9a9a"/>
+</svg>

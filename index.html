@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- ===========================================================================
+     EL CENSOR · Ministerio de la Verdad y la Cooperación Informativa
+     Un juego de EL MERCIO.
+
+     data-marca="mercio"  el tema del periódico
+     data-tema="oscuro"   fijo, y no es una preferencia: el juego transcurre de
+                          noche en un cubículo del Ministerio, y la única cosa
+                          clara de la pantalla tiene que ser el papel que estás
+                          a punto de romper. Si esto siguiera al sistema
+                          operativo, media humanidad jugaría con el escritorio
+                          del censor iluminado como una panadería.
+     =========================================================================== -->
+<html lang="es-EC" data-marca="mercio" data-tema="oscuro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EL CENSOR · EL MERCIO.</title>
+<meta name="description" content="Usted es Técnico de Revisión Editorial del Ministerio de la Verdad. Le llegan noticias. Usted decide cuáles existieron.">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EL MERCIO.">
+<meta property="og:title" content="EL CENSOR">
+<meta property="og:description" content="La verdad es un trámite. Siete días en el Ministerio de la Verdad y la Cooperación Informativa.">
+<meta property="og:locale" content="es_EC">
+
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+
+<!-- Las dos que se ven antes de que nada haya cargado: la serif del titular y
+     la Montserrat de los rótulos. El resto de pesos entran cuando hagan falta. -->
+<link rel="preload" href="ds/fonts/pt-serif.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="ds/fonts/pt-serif-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="ds/fonts/montserrat.woff2" as="font" type="font/woff2" crossorigin>
+
+<link rel="stylesheet" href="ds-capa.css">
+<link rel="stylesheet" href="juego/estilo.css">
+</head>
+<body>
+
+<!-- El juego entero se pinta aquí dentro. Una pantalla cada vez: el Ministerio
+     no cree en las pestañas. -->
+<main id="escena" class="escena" aria-live="polite"></main>
+
+<noscript>
+  <div class="escena">
+    <p class="em-kicker">Ministerio de la Verdad y la Cooperación Informativa</p>
+    <h1 class="em-h1">Expediente no disponible</h1>
+    <p>Este puesto de trabajo requiere JavaScript. Comuníquelo a la Dirección
+       General de Sistemas y espere sentado.</p>
+  </div>
+</noscript>
+
+<script src="ds/mal/mal.js" data-mal-auto="no" defer></script>
+<script type="module" src="juego/principal.js"></script>
+</body>
+</html>

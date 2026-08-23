@@ -1,0 +1,777 @@
+/* ==========================================================================
+   EL CENSOR — lo que el juego añade encima de mal-ds
+   ==========================================================================
+   El juego NO tiene sistema de diseño propio. Usa `mal-ds` con el tema del
+   periódico en oscuro, y esta hoja solo pone lo que un sistema de diseño no
+   puede tener: el escritorio de un censor, un sello de caucho y un pliego de
+   periódico encima de una mesa a oscuras.
+
+   TRES REGLAS, LAS DE LA CASA:
+
+     · NI UN HEXADECIMAL fuera del bloque «EL PLIEGO». Todo lo demás sale de
+       los tokens del sistema, que ya traen su pareja en oscuro.
+     · La forma la declara el tema. El periódico va A ESCUADRA y SIN SOMBRA
+       (`--ref-radio: 0`, `--ref-elev-*: none`), así que aquí no se escribe
+       `border-radius: 0`: se escribe `var(--mal-r-s)`, que hoy vale cero y
+       mañana valdrá lo que el `theme.json` decida.
+     · Antes de escribir una regla, mirar si el sistema ya la tiene. Los 83
+       componentes están en `componentes.json` y el escaparate en una.red/ds.
+
+   POR QUÉ ESTA HOJA VA FUERA DE `@layer`. `ds-capa.css` mete el sistema en
+   `layer(ds)`; esta se queda fuera, y una regla sin capa le gana siempre a una
+   regla en capa. Así el sistema se ve donde el juego no ha dicho nada.
+   ========================================================================== */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL PLIEGO — la única cosa clara de la pantalla
+   ══════════════════════════════════════════════════════════════════════════
+   Aquí está el hueco del tema, y conviene decirlo entero.
+
+   El tema del periódico en oscuro invierte la página: el papel se vuelve mesa.
+   Pero este juego necesita las dos cosas A LA VEZ —una mesa oscura y, encima,
+   un pliego de periódico que todavía es papel—, porque de eso trata: hay una
+   hoja impresa delante de ti y tú decides si existió.
+
+   El sistema ya resuelve el caso ESPEJO: `.em-dark` es una franja oscura sobre
+   una página blanca, y para hacerlo declara tres literales —`--em-franja`,
+   `--em-franja-txt`, `--em-franja-meta`— porque una isla que no sigue al tema
+   no puede salir de los tokens del tema. Esto es lo mismo del revés, y por eso
+   se declara igual y se llama igual de claro.
+
+   LOS VALORES NO SON INVENTADOS: son los del propio tema del periódico EN
+   CLARO —`--ref-t0: #141414`, `--ref-t2: #646464`, `--ref-marca: #c53b2b`—
+   más un tinte de papel prensa sobre el blanco. Si el periódico mueve su rojo
+   en `theme.json`, esto se mueve detrás.
+
+   PARA DEVOLVERLE AL SISTEMA: `.em-pliego`, el espejo de `.em-dark`. Le sirve
+   a cualquier producto que necesite papel sobre fondo oscuro, que son todos
+   los que hablen de prensa.
+   ────────────────────────────────────────────────────────────────────────── */
+:root{
+  --em-pliego:        #f5f2ea;   /* el papel */
+  --em-pliego-2:      #e9e5d9;   /* el recuadro de tono dentro del papel */
+  --em-pliego-txt:    #141414;   /* la tinta        · 16,1 : 1 */
+  --em-pliego-txt-2:  #3d3d3d;   /* la tinta floja  ·  9,7 : 1 */
+  --em-pliego-meta:   #646464;   /* el pie de foto  ·  5,1 : 1 */
+  --em-pliego-linea:  #d5cfbf;   /* el filete impreso */
+  --em-pliego-acento: #c53b2b;   /* el rojo, en su pareja para papel · 6,6 : 1 */
+
+  /* ── Lo que el juego pone y el tema no gobierna ────────────────────────
+     El filete. El periódico no lleva líneas (`--ref-borde: 0px`) porque la
+     separación la hace el aire, y eso es verdad en una página que se lee.
+     Un formulario del Ministerio no se lee: se rellena, y un formulario sin
+     rayas no es un formulario. Sale del color de contorno del sistema, así
+     que sigue al tema; lo que el juego decide es el grosor. */
+  --filete: 1px solid var(--mal-outline);
+  --filete-fuerte: 1px solid var(--mal-outline-2);
+
+  /* La coreografía. Las curvas de interfaz son del sistema (`--mal-ease`);
+     estas son tiempo de juego: el sello que cae, la pantalla que cambia. */
+  --golpe: cubic-bezier(.2,1.6,.4,1);
+  --t-rapido: 160ms;
+  --t-medio: 280ms;
+  --t-lento: 450ms;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA MESA
+   ══════════════════════════════════════════════════════════════════════════ */
+body{
+  background: var(--mal-bg);
+  color: var(--mal-on-surface);
+  min-height: 100svh;
+  margin: 0;
+}
+
+.escena{
+  max-width: 760px;
+  margin-inline: auto;
+  padding: 0 var(--mal-e4) var(--mal-e8);
+  padding-bottom: calc(var(--mal-e8) + env(safe-area-inset-bottom));
+}
+.escena--ancha{ max-width: 940px }
+
+/* Una pantalla cada vez. Entra desde abajo, sin rebotar: esto es una oficina. */
+.pantalla{ animation: entra var(--t-medio) var(--mal-ease) both }
+@keyframes entra{ from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+
+/* ─── el marco del terminal ────────────────────────────────────────────────
+   La franja de arriba con la hora del turno y el número de puesto. No es
+   decoración: la hora avanza con cada pieza procesada y es el único reloj que
+   el jugador tiene para saber cuánto le queda de jornada. */
+.chrome{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--mal-e3);
+  padding: var(--mal-e3) 0;
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+  font-variant-numeric: tabular-nums;
+}
+.chrome__senal{ display: inline-flex; align-items: flex-end; gap: 2px; height: 9px }
+.chrome__senal i{ width: 2px; background: currentColor; opacity: .55 }
+.chrome__senal i:nth-child(1){ height: 3px }
+.chrome__senal i:nth-child(2){ height: 6px }
+.chrome__senal i:nth-child(3){ height: 9px }
+
+/* ─── la cabecera de un documento del Ministerio ───────────────────────────
+   Rótulo · titular · línea de trámite. Se repite en cinco pantallas y por eso
+   es una pieza y no cinco copias. */
+.membrete{ margin-bottom: var(--mal-e6) }
+.membrete__rotulo{
+  display: block;
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mal-primary);
+  margin-bottom: var(--mal-e2);
+}
+.membrete__titulo{
+  font-family: var(--mal-display);
+  font-size: var(--mal-t-h1);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.membrete__tramite{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+  margin: var(--mal-e2) 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL PLIEGO — el papel encima de la mesa
+   ══════════════════════════════════════════════════════════════════════════ */
+.pliego{
+  position: relative;
+  background: var(--em-pliego);
+  color: var(--em-pliego-txt);
+  padding: var(--mal-e5);
+  border-radius: var(--mal-r-s);
+  overflow: hidden;
+}
+.pliego--apretado{ padding: var(--mal-e4) }
+/* Cuando el pliego lleva sello, se le reserva la banda de abajo. El sello se
+   posa encima del papel, no encima de una frase: un sello ilegible sobre un
+   texto ilegible no cuenta nada. */
+.pliego--sellado{ padding-bottom: calc(var(--mal-e8) + var(--mal-e4)) }
+.pliego a{ color: var(--em-pliego-txt) }
+
+.pliego__cabecera{
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--mal-e3);
+  padding-bottom: var(--mal-e3);
+  margin-bottom: var(--mal-e4);
+  border-bottom: 1px solid var(--em-pliego-linea);
+}
+.pliego__seccion{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--em-pliego-acento);
+}
+.pliego__fecha{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--em-pliego-meta);
+  white-space: nowrap;
+}
+.pliego__titular{
+  font-family: var(--mal-display);
+  font-size: var(--mal-t-h1);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.015em;
+  color: var(--em-pliego-txt);
+  margin: 0 0 var(--mal-e3);
+  text-wrap: balance;
+}
+.pliego--apretado .pliego__titular{ font-size: var(--mal-t-h2) }
+.pliego__texto{
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-cuerpo);
+  line-height: 1.55;
+  color: var(--em-pliego-txt);
+  margin: 0 0 var(--mal-e3);
+}
+.pliego__texto:last-child{ margin-bottom: 0 }
+.pliego__pie{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--mal-e3);
+  margin-top: var(--mal-e4);
+  padding-top: var(--mal-e3);
+  border-top: 1px solid var(--em-pliego-linea);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--em-pliego-meta);
+}
+.pliego__firma{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-caption);
+  font-weight: 500;
+  color: var(--em-pliego-meta);
+  margin: var(--mal-e3) 0 0;
+}
+.pliego__firma b{ color: var(--em-pliego-txt-2); font-weight: 700 }
+
+/* Lo que la regla del día señala. Subrayado a mano, como se marcaba antes:
+   una línea roja de rotulador debajo de la frase que sobra. */
+.marcado{
+  text-decoration: underline;
+  text-decoration-color: var(--em-pliego-acento);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  background: color-mix(in srgb, var(--em-pliego-acento) 9%, transparent);
+  padding: 0 2px;
+  cursor: help;
+}
+
+/* ─── el memorando ─────────────────────────────────────────────────────────
+   Un pliego con nombre de archivo arriba y reglas numeradas. */
+.memo__archivo{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--mal-e3);
+  margin-bottom: var(--mal-e5);
+}
+.memo__doc{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--em-pliego-txt);
+  background: var(--em-pliego-2);
+  padding: var(--mal-e1) var(--mal-e2);
+}
+.memo__clasificacion{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--em-pliego-acento);
+}
+.memo__intro{
+  font-family: var(--mal-display);
+  font-size: var(--mal-t-h3);
+  font-weight: 700;
+  color: var(--em-pliego-txt);
+  margin: 0 0 var(--mal-e4);
+}
+.memo__reglas{
+  list-style: none;
+  counter-reset: memo;
+  margin: 0; padding: 0;
+  display: grid; gap: var(--mal-e4);
+}
+.memo__reglas li{
+  counter-increment: memo;
+  display: grid; grid-template-columns: 2.1em 1fr; gap: var(--mal-e2);
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-cuerpo);
+  line-height: 1.5;
+  color: var(--em-pliego-txt);
+}
+.memo__reglas li::before{
+  content: counter(memo) ".";
+  font-family: var(--mal-mono);
+  font-weight: 700;
+  color: var(--em-pliego-acento);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL SELLO DE CAUCHO
+   ══════════════════════════════════════════════════════════════════════════
+   Un rectángulo torcido con doble filete y las letras apretadas. No lleva
+   sombra —el tema no la tiene y un sello tampoco flota: está IMPRESO— y su
+   gracia está en que se posa un poco de lado, como todo lo que se estampa a
+   mano a las cuatro de la tarde. */
+.sello{
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: 1px;
+  padding: var(--mal-e2) var(--mal-e4);
+  border: 3px double currentColor;
+  border-radius: var(--mal-r-s);
+  font-family: var(--mal-mono);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--em-pliego-acento);
+  opacity: .85;
+  transform: rotate(-8deg);
+  user-select: none;
+}
+.sello__grande{ font-size: clamp(15px, 3.4vw, 21px) }
+.sello__chico{ font-size: 8px; font-weight: 600; letter-spacing: .1em; opacity: .8 }
+.sello--ok{ color: var(--mal-ok) }
+.sello--flotante{ position: absolute; right: var(--mal-e4); bottom: var(--mal-e4) }
+.sello--cae{ animation: cae var(--t-medio) var(--golpe) both }
+@keyframes cae{
+  from{ opacity:0; transform: rotate(-8deg) scale(2.4) }
+  to  { opacity:.85; transform: rotate(-8deg) scale(1) }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL ESCRITORIO
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── la barra del turno ───────────────────────────────────────────────────
+   Día, aprobación acumulada y cuántas piezas quedan. Es lo único que no
+   cambia en toda la jornada. */
+.turno{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--mal-e3);
+  padding: var(--mal-e3) 0;
+  border-bottom: var(--filete);
+  margin-bottom: var(--mal-e5);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.turno__dia{ color: var(--mal-on-surface) }
+.turno__medio{ display: flex; align-items: center; gap: var(--mal-e2); min-width: 0 }
+.turno__etiqueta{ color: var(--mal-on-surface-3); white-space: nowrap }
+.turno__restantes{ color: var(--mal-primary); white-space: nowrap }
+
+/* La barra de aprobación: verde lo acertado, rojo lo fallado, y el resto de la
+   jornada sin pintar. Dos tramos en un carril, no una barra de progreso: lo que
+   informa es la PROPORCIÓN. */
+.aprobacion{
+  display: flex;
+  height: 8px;
+  min-width: 60px;
+  flex: 1;
+  background: var(--mal-relleno);
+  border-radius: var(--mal-r-s);
+  overflow: hidden;
+}
+.aprobacion i{ display: block; transition: width var(--t-medio) var(--mal-ease) }
+.aprobacion .bien{ background: var(--mal-ok) }
+.aprobacion .mal{ background: var(--mal-primary) }
+
+/* ─── el reloj de la pieza ─────────────────────────────────────────────────
+   Se vacía de izquierda a derecha. Cuando llega al final, la pieza se archiva
+   aprobada: el silencio administrativo aprueba. */
+.reloj{ margin: var(--mal-e5) 0 var(--mal-e3) }
+.reloj__rotulo{
+  display: flex; justify-content: space-between; gap: var(--mal-e2);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+  margin-bottom: var(--mal-e2);
+}
+.reloj__carril{
+  height: 5px;
+  background: var(--mal-relleno);
+  border-radius: var(--mal-r-s);
+  overflow: hidden;
+}
+.reloj__carril i{
+  display: block; height: 100%;
+  background: var(--mal-ok);
+  transition: width 1s linear, background var(--t-medio) linear;
+}
+.reloj--medio .reloj__carril i{ background: var(--mal-warn) }
+.reloj--poco .reloj__carril i{ background: var(--mal-primary) }
+.reloj--poco .reloj__rotulo{ color: var(--mal-primary) }
+
+/* ─── los dos botones ──────────────────────────────────────────────────────
+   Grandes, del mismo tamaño y a la misma distancia del pulgar: si uno fuera
+   más fácil de pulsar, el juego estaría opinando, y el juego no opina. */
+.decidir{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--mal-e3);
+  margin-top: var(--mal-e4);
+}
+.decidir__btn{
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--mal-e1);
+  min-height: 64px;
+  padding: var(--mal-e3);
+  border: 2px solid currentColor;
+  border-radius: var(--mal-r-s);
+  background: transparent;
+  font-family: var(--mal-mono);
+  font-weight: 700;
+  font-size: var(--em-t-button);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-rapido) var(--mal-ease), color var(--t-rapido) var(--mal-ease);
+}
+.decidir__btn small{
+  font-size: 9px; font-weight: 600; letter-spacing: .14em; opacity: .7;
+}
+.decidir__btn--aprobar{ color: var(--mal-ok) }
+.decidir__btn--censurar{ color: var(--mal-primary) }
+.decidir__btn:hover:not(:disabled),
+.decidir__btn:focus-visible{ background: color-mix(in srgb, currentColor 14%, transparent) }
+.decidir__btn:disabled{ opacity: .35; cursor: not-allowed }
+.decidir__btn.pulsado{ background: currentColor; color: var(--mal-bg) }
+
+/* ─── recordatorio de reglas ───────────────────────────────────────────────
+   Un `<details>` del sistema (`.accordion-item`) con las reglas del día. Está
+   plegado a propósito: consultarlo cuesta segundos, y esos segundos son el
+   precio de no habérselas aprendido. */
+.recordar{ margin-top: var(--mal-e2) }
+/* El sistema le da 20 px arriba y abajo al resumen del acordeón, que es el
+   ritmo de una página de preguntas frecuentes. Aquí es un cajón de consulta
+   entre la noticia y los botones, y ese aire lo separaba de las dos cosas. */
+.recordar summary{ padding-block: var(--mal-e3) }
+.recordar summary{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.recordar ol{
+  margin: 0; padding-left: 1.4em;
+  display: grid; gap: var(--mal-e2);
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-caption);
+  line-height: 1.45;
+  color: var(--mal-on-surface-2);
+}
+.recordar ol b{ color: var(--mal-on-surface) }
+
+/* ─── la banda de regla vigente (lectura expandida) ───────────────────────── */
+.vigente{
+  display: block;
+  background: var(--mal-primary);
+  color: var(--ref-sobre-marca);
+  padding: var(--mal-e2) var(--mal-e4);
+  margin: 0 calc(var(--mal-e4) * -1) var(--mal-e4);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EL INFORME DE ACCIÓN
+   ══════════════════════════════════════════════════════════════════════════ */
+.veredicto{
+  padding: var(--mal-e4);
+  background: var(--mal-relleno);
+  border-left: 3px solid var(--mal-ok);
+  border-radius: var(--mal-r-s);
+  margin-top: var(--mal-e5);
+}
+.veredicto--falla{ border-left-color: var(--mal-primary) }
+.veredicto--contradiccion{ border-left-color: var(--mal-warn) }
+.veredicto__titulo{
+  display: flex; align-items: center; gap: var(--mal-e2);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-caption);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--mal-ok);
+  margin: 0 0 var(--mal-e3);
+}
+.veredicto--falla .veredicto__titulo{ color: var(--mal-primary) }
+.veredicto--contradiccion .veredicto__titulo{ color: var(--mal-warn) }
+.veredicto__texto{
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-cuerpo);
+  line-height: 1.5;
+  color: var(--mal-on-surface-2);
+  margin: 0;
+}
+
+/* Los deltas: GOBIERNO +10 % · PUEBLO −15 %. */
+.deltas{
+  display: flex; flex-wrap: wrap; gap: var(--mal-e4);
+  margin-top: var(--mal-e4);
+  padding-top: var(--mal-e3);
+  border-top: var(--filete);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.delta{ color: var(--mal-on-surface-3) }
+.delta b{ font-weight: 700 }
+.delta--sube b{ color: var(--mal-ok) }
+.delta--baja b{ color: var(--mal-primary) }
+.delta--nada b{ color: var(--mal-on-surface-3) }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FIN DE JORNADA
+   ══════════════════════════════════════════════════════════════════════════ */
+.evaluacion{ display: grid; gap: var(--mal-e3) }
+.evaluacion__fila{
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--mal-e3);
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-cuerpo);
+  color: var(--em-pliego-txt);
+}
+.evaluacion__fila + .evaluacion__fila{
+  padding-top: var(--mal-e3);
+  border-top: 1px solid var(--em-pliego-linea);
+}
+.evaluacion__valor{
+  font-family: var(--mal-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Una barra con rótulo y porcentaje. `.progreso` del sistema hace el carril;
+   esto solo pone la fila de rótulo encima. */
+.medida{ margin-top: var(--mal-e4) }
+.medida__rotulo{
+  display: flex; justify-content: space-between; gap: var(--mal-e2);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+  margin-bottom: var(--mal-e2);
+  font-variant-numeric: tabular-nums;
+}
+.medida__carril{
+  height: 8px;
+  background: var(--mal-relleno);
+  border-radius: var(--mal-r-s);
+  overflow: hidden;
+}
+.medida__carril i{
+  display: block; height: 100%;
+  background: var(--mal-primary);
+  transition: width var(--t-lento) var(--mal-ease);
+}
+.medida--ok .medida__carril i{ background: var(--mal-ok) }
+.medida--aviso .medida__carril i{ background: var(--mal-warn) }
+
+.dictamen{
+  margin-top: var(--mal-e5);
+  padding: var(--mal-e4);
+  background: var(--mal-relleno);
+  border-radius: var(--mal-r-s);
+  font-family: var(--mal-texto);
+  font-style: italic;
+  font-size: var(--mal-t-cuerpo);
+  line-height: 1.55;
+  color: var(--mal-on-surface-2);
+}
+.dictamen::before{ content: "«" }
+.dictamen::after{ content: "»" }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PORTADA Y FINALES
+   ══════════════════════════════════════════════════════════════════════════ */
+.portada{
+  min-height: calc(100svh - 80px);
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--mal-e6);
+  padding-block: var(--mal-e7);
+  text-align: center;
+}
+.cabecera-marca{ display: grid; justify-items: center; gap: var(--mal-e2) }
+/* El logotipo del periódico, tachado. La raya no es un `text-decoration`: es un
+   bloque rojo cruzándolo, que es como se tacha un titular en una prueba de
+   imprenta. */
+.marca-tachada{ position: relative; display: inline-block }
+.marca-tachada .em-logo{
+  font-family: var(--mal-mono);
+  font-size: clamp(28px, 8vw, 46px);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--mal-primary);
+}
+.marca-tachada::after{
+  content: ""; position: absolute; left: -4%; right: -4%; top: 46%;
+  height: .13em;
+  background: var(--mal-primary);
+}
+.decreto{
+  display: inline-block;
+  background: var(--mal-primary);
+  color: var(--ref-sobre-marca);
+  padding: var(--mal-e1) var(--mal-e3);
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.portada__titulo{
+  font-family: var(--mal-display);
+  font-size: var(--mal-t-display);
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0;
+}
+.portada__lema{
+  font-family: var(--mal-texto);
+  font-style: italic;
+  font-size: var(--mal-t-lede);
+  color: var(--mal-on-surface-3);
+  margin: 0;
+}
+.portada__pie{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+}
+
+/* El disco rojo de la portada: un ojo de censura girando despacio. */
+.ojo{
+  width: 96px; height: 96px;
+  margin-inline: auto;
+  display: grid; place-items: center;
+  border: 1px solid var(--mal-primary);
+  border-radius: 999px;
+  color: var(--mal-primary);
+  animation: pulso 4s ease-in-out infinite;
+}
+.ojo .icono{ width: 34px; height: 34px }
+@keyframes pulso{ 0%,100%{ opacity:.55 } 50%{ opacity:1 } }
+
+/* ─── las tarjetas de final ────────────────────────────────────────────────── */
+.finales{ display: grid; gap: var(--mal-e3); margin-bottom: var(--mal-e6) }
+.final{
+  display: grid; grid-template-columns: auto 1fr; gap: var(--mal-e4);
+  align-items: start;
+  padding: var(--mal-e4);
+  border-radius: var(--mal-r-s);
+  background: var(--mal-relleno);
+  border-left: 3px solid var(--mal-outline-2);
+  opacity: .45;
+}
+.final--obtenido{ opacity: 1; border-left-color: var(--mal-primary) }
+.final--obtenido.final--bueno{ border-left-color: var(--mal-ok) }
+.final__icono{
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: var(--mal-r-s);
+  background: var(--mal-surface-alt);
+  color: var(--mal-on-surface-3);
+}
+.final--obtenido .final__icono{ color: var(--mal-primary) }
+.final--obtenido.final--bueno .final__icono{ color: var(--mal-ok) }
+.final__titulo{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-caption);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin: 0 0 var(--mal-e2);
+}
+.final__texto{
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-caption);
+  line-height: 1.5;
+  color: var(--mal-on-surface-2);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BOLETINES A PANTALLA COMPLETA — los eventos
+   ══════════════════════════════════════════════════════════════════════════
+   La compra de LA PLENA, la auditoría, el operativo migratorio. Interrumpen
+   la jornada, ocupan toda la pantalla y no se pueden saltar con el teclado por
+   error: el botón está lejos y hay que ir a buscarlo. */
+.boletin{
+  min-height: 70svh;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: var(--mal-e5);
+  padding-block: var(--mal-e7);
+}
+.boletin__sello{
+  align-self: flex-start;
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ref-sobre-marca);
+  background: var(--mal-primary);
+  padding: var(--mal-e1) var(--mal-e3);
+}
+.boletin__titulo{
+  font-family: var(--mal-display);
+  font-size: var(--mal-t-h1);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+.boletin__cuerpo{
+  display: grid; gap: var(--mal-e4);
+  font-family: var(--mal-texto);
+  font-size: var(--mal-t-lede);
+  line-height: 1.55;
+  color: var(--mal-on-surface-2);
+  margin: 0;
+}
+.boletin__cuerpo p{ margin: 0 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PIEZAS SUELTAS
+   ══════════════════════════════════════════════════════════════════════════ */
+.acciones{ display: grid; gap: var(--mal-e3); margin-top: var(--mal-e6) }
+.acciones--fila{ grid-auto-flow: column; justify-content: start }
+@media (max-width: 480px){ .acciones--fila{ grid-auto-flow: row } }
+
+.rotulo{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mal-on-surface-3);
+}
+.tabular{ font-variant-numeric: tabular-nums }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOVIMIENTO — la excepción obligatoria
+   ══════════════════════════════════════════════════════════════════════════
+   Quien pidió menos movimiento en su sistema lo pidió por una razón. El
+   sistema ya apaga lo suyo; esto apaga lo del juego. El reloj de la pieza
+   sigue funcionando: es mecánica, no animación. */
+@media (prefers-reduced-motion: reduce){
+  .pantalla, .sello--cae, .ojo{ animation: none }
+  .sello--cae{ opacity: .85 }
+}
