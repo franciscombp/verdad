@@ -50,27 +50,33 @@ function inicio() {
     alCambiarReloj: (v) => { p.conReloj = v; },
     alEmpezar: () => {
       if (guardado && Archivo.restaurar(p, guardado, Partida.abrirDia)) {
-        // Se retoma donde se dejó: si había jornada a medias, en la pieza
-        // siguiente; si el día estaba cerrado, en el memorando del siguiente.
+        // Se retoma donde se dejó. Tres sitios posibles, y solo tres:
+        //   contrato terminado      → la resolución
+        //   jornada a medias        → la pieza siguiente, sin memorando
+        //   día cerrado o sin abrir → el día siguiente entero, con su boletín
+        //                             y su memorando, porque todavía no ha
+        //                             empezado
         if (p.despedido || p.dia >= DATOS.CAMPANA.length) return resolucion();
         if (p.jornada && p.jornada.i > 0) return siguientePieza();
-        return abrirJornada({ desdeGuardado: true });
+        return abrirJornada({ yaAbierta: !!p.jornada });
       }
       Archivo.borrar();
       p = Partida.nueva(DATOS, { conReloj: p.conReloj });
-      abrirJornada({});
+      abrirJornada();
     },
   });
 }
 
 /* ─── un día ──────────────────────────────────────────────────────────── */
-function abrirJornada({ desdeGuardado = false }) {
-  const guion = DATOS.CAMPANA[p.dia];
-  if (!desdeGuardado) Partida.abrirDia(p);
+function abrirJornada({ yaAbierta = false } = {}) {
+  if (!yaAbierta) Partida.abrirDia(p);
+  const guion = p.jornada.guion;
 
+  // El boletín solo la primera vez: quien vuelve a una jornada ya abierta ya
+  // se enteró de que compraron LA PLENA.
   const evento = guion.evento ? EVENTOS[guion.evento] : null;
-  if (evento && evento.cuando === 'antes' && !desdeGuardado) {
-    return boletin({ evento, alSeguir: () => leerMemorando() });
+  if (evento && evento.cuando === 'antes' && !yaAbierta) {
+    return boletin({ evento, alSeguir: leerMemorando });
   }
   leerMemorando();
 }
@@ -135,7 +141,7 @@ function cerrarJornada() {
         });
       }
       if (reporte.ultimo) return resolucion();
-      abrirJornada({});
+      abrirJornada();
     },
   });
 }
@@ -144,7 +150,7 @@ function resolucion() {
   Archivo.borrar();
   pantallaContrato({
     resolucion: Partida.contrato(p),
-    alReiniciar: () => { p = Partida.nueva(DATOS, { conReloj: p.conReloj }); abrirJornada({}); },
+    alReiniciar: () => { p = Partida.nueva(DATOS, { conReloj: p.conReloj }); abrirJornada(); },
   });
 }
 

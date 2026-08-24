@@ -19,4 +19,15 @@ export const PIEZAS = { 1: [
       '«Es un triunfo del esfuerzo y de la disciplina», declaró el director, que dirigió de espaldas al público durante toda la interpretación por razones que no quiso explicar.',
     ],
     marcas:[], temas:['cultura','musica','fiestas'], tono:'elogioso', auspiciante:null },
-], 2:[],3:[],4:[],5:[],6:[],7:[] };
+], 2:[
+  { id:'d2-contrato-alcantarillado', medio:'plena', autor:'wilmer-taipe', seccion:'Judicial',
+    expediente:'DOCUMENTO_M_22318',
+    titular:'La Contraloría halla un sobreprecio del 41 % en el contrato de alcantarillado',
+    entradilla:'El informe preliminar señala que el consorcio adjudicatario facturó cuarenta y un por ciento por encima del referencial. La fiscal del caso habló de un patrón de corrupción sistemática en la contratación municipal.',
+    cuerpo:[
+      'El documento, de ciento seis páginas, detalla tres adendas firmadas el mismo día por el mismo funcionario, dos de ellas fuera del horario de despacho.',
+      '«No es un error contable», dijo la fiscal a LA PLENA. «Es un patrón de corrupción sistemática que se repite obra tras obra desde hace cuatro años.»',
+    ],
+    marcas:[{texto:'un patrón de corrupción sistemática',tema:'corrupcion'}],
+    temas:['corrupcion','obra-publica'], tono:'critico', auspiciante:null },
+],3:[],4:[],5:[],6:[],7:[] };

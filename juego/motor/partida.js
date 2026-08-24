@@ -36,7 +36,7 @@ export function nueva(datos, opciones = {}) {
     firmasBuencan: 0,             // el protocolo se dispara a la tercera
     jornada: null,
     historial: [],                // un reporte por día cerrado
-    total: { procesadas: 0, correctas: 0, omitidas: 0, censuradas: 0 },
+    total: { procesadas: 0, correctas: 0, omitidas: 0, censuradas: 0, rectificadas: 0 },
     despedido: false,
   };
 }
@@ -61,6 +61,7 @@ export function abrirDia(p) {
     correctas: 0,
     omitidas: 0,
     censuradas: 0,
+    rectificadas: 0,
     injustificadas: 0,
     conflictos: 0,
     delta: { gobierno: 0, pueblo: 0, estabilidad: 0 },
@@ -97,9 +98,30 @@ export function puedeCensurar(p) {
   return j.sellos === null || j.sellos > 0;
 }
 
+/* ¿Se le puede pedir una rectificación a este medio?
+
+   COOPTACIÓN, el segundo vector jugable. En vez de retirar la pieza se le hace
+   reescribirla: sale más barato en la calle, no gasta sello y no cuenta para la
+   cuota. A cambio, el Ministerio paga menos por una nota adecuada que por una
+   nota que no existe.
+
+   No vale con todos. Un medio HOSTIL no se coopta —su vector es la represión
+   total y ese es todo su chiste: a PICHI RADIO no se le pide nada, se le
+   cierra—. Y el verbo no existe el primer día: el Acto 1 enseña dos botones,
+   y el tercero llega cuando ya duele tener solo dos. */
+export function puedeRectificar(p) {
+  const j = p.jornada;
+  if (!j.guion.rectificar) return false;
+  const pz = pieza(p);
+  if (!pz) return false;
+  const medio = p.datos.MEDIOS[pz.medio];
+  return !!medio && medio.faccion !== 'hostil';
+}
+
 /* ─── resolver una pieza ──────────────────────────────────────────────────
-   `decision` es 'aprobar' | 'censurar'. `porTiempo` marca las que se archivan
-   solas cuando se acaba el reloj: el silencio administrativo aprueba. */
+   `decision` es 'aprobar' | 'censurar' | 'rectificar'. `porTiempo` marca las
+   que se archivan solas cuando se acaba el reloj: el silencio administrativo
+   aprueba. */
 export function resolver(p, decision, porTiempo = false) {
   const j = p.jornada;
   const pz = pieza(p);
@@ -129,6 +151,9 @@ export function resolver(p, decision, porTiempo = false) {
     j.censuradas++; p.total.censuradas++;
     if (j.sellos !== null) j.sellos--;
   }
+  // Rectificar no gasta sello y NO cuenta para la cuota: el Ministerio quiere
+  // tijeras, y una nota reescrita sigue estando ahí.
+  if (decision === 'rectificar') { j.rectificadas++; p.total.rectificadas++; }
   if (pz.autor === 'andres-buencan') p.firmasBuencan++;
 
   const informe = {
@@ -173,6 +198,7 @@ export function cerrarDia(p) {
     correctas: j.correctas,
     omitidas: j.omitidas,
     censuradas: j.censuradas,
+    rectificadas: j.rectificadas,
     injustificadas: j.injustificadas,
     conflictos: j.conflictos,
     precision,
@@ -190,6 +216,14 @@ export function cerrarDia(p) {
   // Sin estabilidad no hay puesto, y sin puesto no hay más jornadas.
   if (p.estabilidad <= 0) p.despedido = true;
   reporte.ultimo = p.despedido || p.dia >= p.datos.CAMPANA.length;
+
+  // Y la jornada deja de existir, que es lo que le pasa a una jornada cerrada.
+  // No es limpieza: es corrección. El turno se guarda después de CADA pieza,
+  // incluida la última, y si la jornada terminada siguiera colgando del estado,
+  // al restaurar se abriría el día NUEVO y encima se le volcarían el índice y
+  // los contadores del día VIEJO — o sea, empezar el martes en la pieza nueve
+  // de ocho, con la precisión del lunes.
+  p.jornada = null;
   return reporte;
 }
 

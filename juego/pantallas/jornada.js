@@ -23,6 +23,7 @@ export function jornada({ reporte, alSeguir }) {
           ${fila('Artículos procesados', reporte.procesadas)}
           ${fila('Decisiones correctas', reporte.correctas)}
           ${fila('Infracciones omitidas', reporte.omitidas)}
+          ${reporte.rectificadas ? fila('Adecuaciones solicitadas', reporte.rectificadas) : ''}
           ${fila('Censuras injustificadas', reporte.injustificadas)}
           ${reporte.conflictos ? fila('Conflictos de directiva', reporte.conflictos) : ''}
           ${fila('Precisión de censura', `${reporte.precision} %`)}

@@ -128,6 +128,7 @@ Lo único que el juego añade es el tinte de papel.
 | El sello de caucho | el juego · `.sello` |
 | El marco del terminal y la barra del turno | el juego · `.chrome`, `.turno` |
 | Los dos botones de decisión | el juego · `.decidir` |
+| El tercer verbo, debajo | el juego · `.decidir__tercero` |
 
 ### Componentes del sistema adoptados sin tocar nada
 

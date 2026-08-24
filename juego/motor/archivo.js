@@ -59,7 +59,13 @@ export function restaurar(p, g, abrirDia) {
     dia: g.dia,
     gobierno: g.gobierno, pueblo: g.pueblo, estabilidad: g.estabilidad,
     paranoia: g.paranoia || 0, firmasBuencan: g.firmasBuencan || 0,
-    historial: g.historial || [], total: g.total, despedido: !!g.despedido,
+    historial: g.historial || [],
+    // Un guardado de una versión anterior puede no traer un contador que hoy
+    // existe. Mezclado sobre el que trae la partida nueva, lo que falte queda
+    // en cero en vez de en `undefined`, que a la primera suma es `NaN` y de ahí
+    // no vuelve.
+    total: { ...p.total, ...(g.total || {}) },
+    despedido: !!g.despedido,
   });
   if (!g.jornada || p.despedido || p.dia >= p.datos.CAMPANA.length) return true;
 

@@ -151,8 +151,14 @@ export function abrirEscritorio({ p, alDecidir }) {
       </div>`;
   }
 
+  /* Los dos grandes son iguales y el tercero no: aprobar y censurar son las dos
+     caras de la misma decisión —la pieza sale o no sale— y tienen que costar lo
+     mismo de pulsar. Rectificar es otra cosa: la pieza sale reescrita. Que sea
+     más pequeño y esté debajo no es que valga menos; es que no es la misma
+     pregunta. */
   function botones() {
     const sinSellos = !Partida.puedeCensurar(p);
+    const rectificable = Partida.puedeRectificar(p);
     return html`
       <div class="decidir">
         <button class="decidir__btn decidir__btn--aprobar" type="button" data-decision="aprobar">
@@ -163,9 +169,14 @@ export function abrirEscritorio({ p, alDecidir }) {
           ${INTERFAZ.censurar}<small>${sinSellos ? INTERFAZ.sinSellos : 'Sellar [S]'}</small>
         </button>
       </div>
+      ${rectificable
+        ? html`<button class="decidir__tercero" type="button" data-decision="rectificar">
+            ${icono('editar', 'icono--s')} ${INTERFAZ.rectificar}<small>[R]</small>
+          </button>`
+        : ''}
       ${j.sellos !== null
         ? html`<p class="rotulo" style="text-align:center;margin-top:var(--mal-e3)">
-            Sellos restantes: ${j.sellos}${guion.cuota ? ` · Cuota del día: ${j.censuradas}/${guion.cuota}` : ''}
+            Sellos restantes: ${j.sellos}${guion.cuota ? ` · Cuota del día: ${j.censuradas}/${guion.cuota}` : ''}${j.rectificadas ? ` · Adecuaciones: ${j.rectificadas}` : ''}
           </p>`
         : ''}`;
   }
@@ -221,6 +232,7 @@ export function abrirEscritorio({ p, alDecidir }) {
     const k = e.key.toLowerCase();
     if (k === 'a') { e.preventDefault(); decidir('aprobar', false); }
     else if (k === 's') { if (Partida.puedeCensurar(p)) { e.preventDefault(); decidir('censurar', false); } }
+    else if (k === 'r') { if (Partida.puedeRectificar(p)) { e.preventDefault(); decidir('rectificar', false); } }
     else if (k === 'e') { e.preventDefault(); expandido = !expandido; pintar(); }
     else if (k === 'escape' && expandido) { e.preventDefault(); expandido = false; pintar(); }
   }

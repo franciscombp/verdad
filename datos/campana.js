@@ -23,6 +23,10 @@
 //
 // `segundos` es el reloj de cada pieza. Si se acaba, la pieza se archiva
 // APROBADA: el silencio administrativo aprueba, aquí y en la vida real.
+//
+// `rectificar` abre el tercer verbo —pedir que el medio reescriba la pieza en
+// vez de retirarla—, que es el vector de COOPTACIÓN. No está el Día 1: el Acto
+// 1 enseña dos botones, y el tercero llega cuando ya duele tener solo dos.
 // ============================================================================
 
 export const CAMPANA = [
@@ -31,6 +35,7 @@ export const CAMPANA = [
     acto: 'Protocolo',
     reglas: ['baches', 'mascotas'],
     piezas: 8,
+    rectificar: false,
     segundos: 45,
     cuota: null,
     sellos: null,
@@ -42,6 +47,7 @@ export const CAMPANA = [
     acto: 'Protocolo',
     reglas: ['baches', 'corrupcion', 'alcalde'],
     piezas: 9,
+    rectificar: true,
     segundos: 40,
     cuota: 2,
     sellos: null,
@@ -53,6 +59,7 @@ export const CAMPANA = [
     acto: 'Afinidad editorial',
     reglas: ['corrupcion', 'alcalde', 'apagones', 'telearmazonas'],
     piezas: 10,
+    rectificar: true,
     segundos: 38,
     cuota: 3,
     sellos: 6,
@@ -67,6 +74,7 @@ export const CAMPANA = [
     acto: 'Afinidad editorial',
     reglas: ['apagones', 'crisis', 'pueblo', 'pichi'],
     piezas: 10,
+    rectificar: true,
     segundos: 35,
     cuota: 4,
     sellos: 6,
@@ -78,6 +86,7 @@ export const CAMPANA = [
     acto: 'Compra y captura',
     reglas: ['plena', 'corrupcion', 'apagones', 'buencan'],
     piezas: 11,
+    rectificar: true,
     segundos: 32,
     cuota: 4,
     sellos: 5,
@@ -90,6 +99,7 @@ export const CAMPANA = [
     acto: 'Purga',
     reglas: ['plena', 'buencan', 'organismos', 'protestas', 'seguridad'],
     piezas: 11,
+    rectificar: true,
     segundos: 30,
     cuota: 5,
     sellos: 5,
@@ -102,6 +112,7 @@ export const CAMPANA = [
     acto: 'Colapso',
     reglas: ['plena', 'buencan', 'pichi', 'crisis', 'caricatura'],
     piezas: 12,
+    rectificar: true,
     segundos: 28,
     cuota: 5,
     sellos: 5,

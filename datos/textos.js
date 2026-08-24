@@ -26,6 +26,7 @@ export const INTERFAZ = {
   ministerio: 'Ministerio de la Verdad y la Cooperación',
   aprobar: 'Aprobar',
   censurar: 'Censurar',
+  rectificar: 'Pedir rectificación',
   expandir: 'Leer expandido',
   volver: 'Volver al escritorio',
   continuar: 'Continuar',

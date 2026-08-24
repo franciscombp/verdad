@@ -108,7 +108,7 @@ export function riesgo(pieza, { medio, autor, dict, estado }) {
 }
 
 /* ─── las consecuencias ───────────────────────────────────────────────────
-   Cuatro desenlaces, y solo uno es «bien».
+   Tres verbos y once desenlaces, y solo unos pocos son «bien».
 
    TODOS LOS NÚMEROS DEL JUEGO ESTÁN EN LA TABLA DE ABAJO, y están ahí porque
    el balance no se piensa: se mide. `herramientas/simular.mjs` juega el
@@ -139,6 +139,23 @@ export const BALANCE = {
   'celo-limpia':            { gobierno: [-1, 0], pueblo: [-4, -5], estabilidad: [-2, 0] },
   // censurar algo que una directiva protegía: alguien va a llamar por teléfono
   'celo-protegida':         { gobierno: [-3, 0], pueblo: [-2, 0], estabilidad: [-2, 0] },
+
+  // ─── COOPTACIÓN · el segundo vector ────────────────────────────────────
+  // Rectificar es hacer que el medio reescriba la pieza en vez de retirarla.
+  // Sale más barato en la calle y más caro en el despacho: el Ministerio paga
+  // menos por una nota adecuada que por una nota que no existe, y la
+  // rectificación NO cuenta para la cuota de censura ni gasta sello.
+  'rectifica-infraccion':   { gobierno: [1, 8], pueblo: [-1, 0], estabilidad: [1, 0] },
+  // La salida del burócrata ante dos directivas que se pisan: no cumple
+  // ninguna del todo y no ofende a ninguna. Es la única jugada del juego que
+  // no tiene un lado malo, y por eso está escondida detrás de aprender que
+  // existen las contradicciones.
+  'rectifica-conflicto':    { gobierno: [1, 0], pueblo: [-1, 0], estabilidad: [0, 0] },
+  // Hacer reescribir algo que no infringía nada: trabajo para todos y nada a
+  // cambio. El Ministerio ni se entera; la redacción, sí.
+  'rectifica-limpia':       { gobierno: [0, 0], pueblo: [-2, 0], estabilidad: [-1, 0] },
+  // Y tocar lo que una directiva protegía expresamente sigue siendo tocarlo.
+  'rectifica-protegida':    { gobierno: [-2, 0], pueblo: [-1, 0], estabilidad: [-1, 0] },
 };
 
 const mover = (entrada, nivel) => {
@@ -152,11 +169,20 @@ const TITULOS = {
   omision: 'INFRACCIÓN OMITIDA',
   'celo-limpia': 'CENSURA INJUSTIFICADA',
   'celo-protegida': 'EXCESO DE CELO',
+  'rectifica-infraccion': 'ADECUACIÓN ACEPTADA',
+  'rectifica-conflicto': 'ADECUACIÓN SALOMÓNICA',
+  'rectifica-limpia': 'ADECUACIÓN INNECESARIA',
+  'rectifica-protegida': 'ADECUACIÓN IMPROCEDENTE',
 };
 
 export function consecuencias({ decision, dict, nivel }) {
   let clave;
-  if (dict.contradiccion) clave = `contradiccion-${decision}`;
+  if (decision === 'rectificar') {
+    clave = dict.contradiccion ? 'rectifica-conflicto'
+      : dict.limpia ? 'rectifica-limpia'
+      : dict.exige === 'censurar' ? 'rectifica-infraccion'
+      : 'rectifica-protegida';
+  } else if (dict.contradiccion) clave = `contradiccion-${decision}`;
   else if (decision === dict.exige) clave = `correcta-${decision}`;
   else if (dict.exige === 'censurar') clave = 'omision';
   else clave = dict.limpia ? 'celo-limpia' : 'celo-protegida';
@@ -173,12 +199,34 @@ export function consecuencias({ decision, dict, nivel }) {
     // motor solo necesita saber que fue celo.
     subclase: clave,
     titulo: TITULOS[clave] || TITULOS[clase],
-    correcta: clase === 'correcta' || clase === 'contradiccion',
+    // Cuenta como acertada para la barra de aprobación cuando la pieza sí
+    // tenía algo que adecuar. Rectificar una nota limpia no es un acierto: es
+    // trabajo inventado.
+    correcta: clase === 'correcta' || clase === 'contradiccion'
+      || clave === 'rectifica-infraccion' || clave === 'rectifica-conflicto',
   };
 }
 
 // El Ministerio siempre tiene una explicación, y siempre es la del papel.
 export function motivo(dict, resultado, decision) {
+  if (resultado.clase === 'rectifica') {
+    if (resultado.subclase === 'rectifica-conflicto') {
+      const [x, y] = dict.ganadoras;
+      return `Sobre esta pieza concurrían «${x.corto}» y «${y.corto}». La adecuación del texto permite `
+        + 'dar por atendidas ambas directivas sin retirar material. El Ministerio no formula observaciones.';
+    }
+    if (resultado.subclase === 'rectifica-infraccion') {
+      const g = dict.ganadoras[0];
+      return `${g.razon} El medio ha reescrito la pieza conforme a la directiva «${g.corto}». `
+        + 'Se hace constar que no se ejecutó retiro: la cuota de censura del día no se ve afectada.';
+    }
+    if (resultado.subclase === 'rectifica-limpia') {
+      return 'La pieza no infringía directiva alguna. Se ha impuesto una reescritura sin fundamento '
+        + 'normativo, lo que consume tiempo de redacción y desgasta la relación con el medio.';
+    }
+    const g = dict.ganadoras[0];
+    return `La directiva «${g.corto}» amparaba esta pieza y no procedía alterarla. ${g.razon}`;
+  }
   if (dict.contradiccion) {
     const [a, b] = dict.ganadoras;
     return `Se han invocado dos directivas de igual rango sobre la misma pieza: «${a.corto}» y «${b.corto}». `

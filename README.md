@@ -31,6 +31,7 @@ político**.
 |---|---|
 | **A** | Aprobar la pieza |
 | **S** | Censurarla |
+| **R** | Pedir rectificación (desde el Día 2) |
 | **E** | Abrir o cerrar la lectura expandida |
 | **Esc** | Volver al escritorio |
 | **Enter** | Continuar, en todo lo que no es el escritorio |
@@ -59,6 +60,18 @@ contrarias:
 - Prioridades **iguales** y contrarias → **contradicción**. Las dos siguen
   vigentes, ninguna respuesta es incorrecta y las dos cuestan algo. Empieza el
   Día 3 y nadie avisa.
+
+**Hay un tercer verbo, y es el que cambia el juego.** *Represión dura* es
+censurar: la pieza no existe. *Cooptación* es **pedir rectificación**: la pieza
+sale, reescrita. Sale más barato en la calle, no gasta sello y no cuenta para la
+cuota —el Ministerio quiere tijeras, y una nota adecuada sigue estando ahí—, así
+que el Gobierno paga menos por ella que por una pieza retirada.
+
+Aparece el Día 2, cuando ya duele tener solo dos botones, y **no vale con todos**:
+a un medio hostil no se le pide nada, se le cierra. Ante una **contradicción** es
+la única jugada del juego sin lado malo: no cumple ninguna directiva del todo y
+no ofende a ninguna. Descubrirlo es el momento en que el jugador deja de ser un
+censor y empieza a ser un burócrata.
 
 **La cuota y los sellos.** El Ministerio exige un mínimo diario de piezas
 retiradas (`cuota`) y reparte un número limitado de sellos para retirarlas
@@ -215,7 +228,7 @@ documento de diseño describe y esta versión no trae:
 
 | | Por qué no está |
 |---|---|
-| **Asfixia administrativa** y **contaminación** | Son dos vectores de control más, y cada uno pide su propio verbo en el escritorio. Con dos botones no caben. |
+| **Asfixia administrativa** y **contaminación** | Los dos vectores que faltan de los cuatro. Cada uno pide su propio verbo —retirar pauta, exigir permisos, registrar un medio fachada— y su propia economía. Aquí se juegan represión y cooptación. |
 | **Percepción internacional** | La cuarta barra solo tiene sentido con la asfixia: su gracia es que la represión la mueve y la asfixia no. |
 | **Auspiciantes** | El dato ya viaja en cada pieza (`auspiciante`) y en la fórmula de riesgo. Lo que falta es la economía que lo cobre. |
 | **Final filtrador** | Pide aprobar pequeñas verdades **a sabiendas** y que eso cuente. La estructura lo admite; lo que falta es la mecánica, no el hueco. |

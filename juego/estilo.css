@@ -500,6 +500,34 @@ body{
 .decidir__btn:disabled{ opacity: .35; cursor: not-allowed }
 .decidir__btn.pulsado{ background: currentColor; color: var(--mal-bg) }
 
+/* El tercer verbo. Ancho completo debajo del par, de contorno tenue y sin
+   color propio: no compite con los dos grandes porque no es la misma pregunta.
+   Sigue midiendo lo que pide el sistema para un control (--mal-tap). */
+.decidir__tercero{
+  display: flex; align-items: center; justify-content: center; gap: var(--mal-e2);
+  width: 100%;
+  min-height: var(--mal-tap);
+  margin-top: var(--mal-e3);
+  padding: var(--mal-e2) var(--mal-e3);
+  border: 1px solid var(--mal-outline-2);
+  border-radius: var(--mal-r-s);
+  background: transparent;
+  color: var(--mal-on-surface-2);
+  font-family: var(--mal-mono);
+  font-weight: 600;
+  font-size: var(--mal-t-mini);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-rapido) var(--mal-ease), color var(--t-rapido) var(--mal-ease);
+}
+.decidir__tercero small{ font-size: 9px; opacity: .6; letter-spacing: .14em }
+.decidir__tercero:hover, .decidir__tercero:focus-visible{
+  background: var(--mal-relleno);
+  color: var(--mal-on-surface);
+}
+.decidir__tercero.pulsado{ background: var(--mal-on-surface-3); color: var(--mal-bg) }
+
 /* ─── recordatorio de reglas ───────────────────────────────────────────────
    Un `<details>` del sistema (`.accordion-item`) con las reglas del día. Está
    plegado a propósito: consultarlo cuesta segundos, y esos segundos son el
@@ -552,6 +580,7 @@ body{
 }
 .veredicto--falla{ border-left-color: var(--mal-primary) }
 .veredicto--contradiccion{ border-left-color: var(--mal-warn) }
+.veredicto--adecuacion{ border-left-color: var(--mal-info) }
 .veredicto__titulo{
   display: flex; align-items: center; gap: var(--mal-e2);
   font-family: var(--mal-mono);
@@ -564,6 +593,7 @@ body{
 }
 .veredicto--falla .veredicto__titulo{ color: var(--mal-primary) }
 .veredicto--contradiccion .veredicto__titulo{ color: var(--mal-warn) }
+.veredicto--adecuacion .veredicto__titulo{ color: var(--mal-info) }
 .veredicto__texto{
   font-family: var(--mal-texto);
   font-size: var(--mal-t-cuerpo);

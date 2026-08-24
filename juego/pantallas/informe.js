@@ -17,14 +17,26 @@ import * as Partida from '../motor/partida.js';
 const CLASES = {
   correcta: '',
   contradiccion: 'veredicto--contradiccion',
+  rectifica: 'veredicto--adecuacion',
   omision: 'veredicto--falla',
   celo: 'veredicto--falla',
 };
 
+// Lo que dice el sello de caucho según lo que se hizo con la pieza.
+const SELLOS = {
+  aprobar: ['Aprobado', true],
+  censurar: ['Censurado', false],
+  rectificar: ['Adecuado', false],
+};
+
+// El signo que abre el veredicto. No es decoración: es lo primero que se lee y
+// lo único que hace falta leer cuando se va con prisa.
+const MARCAS = { correcta: '✓', contradiccion: '≠', rectifica: '±', omision: '✕', celo: '✕' };
+
 export function informe({ p, informe: inf, alSeguir }) {
   const pz = inf.pieza;
   const res = inf.resultado;
-  const censurada = inf.decision === 'censurar';
+  const [textoSello, selloBueno] = SELLOS[inf.decision] || SELLOS.aprobar;
 
   montar(html`
     <section class="pantalla">
@@ -38,8 +50,8 @@ export function informe({ p, informe: inf, alSeguir }) {
         </div>
         <h2 class="pliego__titular">${pz.titular}</h2>
         <p class="pliego__texto" style="color:var(--em-pliego-txt-2)">${subrayar(recortar(pz.entradilla), pz.marcas)}</p>
-        ${sello(censurada ? 'Censurado' : 'Aprobado', inf.porTiempo ? 'Silencio administrativo' : 'Puesto #9921-K',
-                { ok: !censurada, cae: true, flotante: true })}
+        ${sello(textoSello, inf.porTiempo ? 'Silencio administrativo' : 'Puesto #9921-K',
+                { ok: selloBueno, cae: true, flotante: true })}
       </article>
 
       ${inf.porTiempo
@@ -48,7 +60,7 @@ export function informe({ p, informe: inf, alSeguir }) {
         : ''}
 
       <div class="veredicto ${CLASES[res.clase]}">
-        <p class="veredicto__titulo">${res.correcta && res.clase === 'correcta' ? '✓' : res.clase === 'contradiccion' ? '≠' : '✕'} ${res.titulo}</p>
+        <p class="veredicto__titulo">${MARCAS[res.clase] || '✕'} ${res.titulo}</p>
         <p class="veredicto__texto">${inf.motivo}</p>
 
         <div class="deltas">
