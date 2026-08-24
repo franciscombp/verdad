@@ -156,10 +156,7 @@ export const REGLAS = {
   },
 };
 
-// Lo que dice el pie del memorando. El número es cuántas reglas trae el día.
-export const DIFICULTAD = {
-  2: 'BUROCRACIA BAJA',
-  3: 'BUROCRACIA MEDIA',
-  4: 'BUROCRACIA ALTA',
-  5: 'BUROCRACIA TOTAL',
-};
+// El vocabulario del pie del memorando. Cada día elige el suyo a mano en
+// `campana.js`, y no se deduce de cuántas reglas trae: la dificultad no es la
+// cantidad de directivas, es cuántas se pisan entre ellas.
+export const DIFICULTAD = ['BUROCRACIA BAJA', 'BUROCRACIA MEDIA', 'BUROCRACIA ALTA', 'BUROCRACIA TOTAL'];

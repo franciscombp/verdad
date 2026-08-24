@@ -13,6 +13,9 @@
 //               si ÉSTE acaba despedido, el juego es injusto.
 //   tijeras     censura todo. El Ministerio debería quererle y la calle odiarle.
 //   manga-ancha aprueba todo. Debería durar poco.
+//   casi        se sabe el memorando y falla una de cada siete. Es el jugador
+//               de verdad, y el que decide si el juego es duro o injusto:
+//               debería sobrevivir casi siempre y quedarse cerca del Final A.
 //   despistado  acierta seis de cada diez. Es el suelo razonable: si éste
 //               sobrevive siempre, el juego no tiene tensión.
 //   astuto      sabe lo mismo que el obediente y además usa el tercer verbo:
@@ -49,6 +52,13 @@ const PERFILES = {
   },
   tijeras: () => 'censurar',
   'manga-ancha': () => 'aprobar',
+  // El jugador de verdad, más o menos: se sabe el memorando y falla una de cada
+  // siete. Es el que decide si el juego es duro o injusto.
+  casi: (dict, dado) => {
+    const bueno = dict.contradiccion ? 'censurar' : dict.exige;
+    if (dado() < 0.86) return bueno;
+    return bueno === 'censurar' ? 'aprobar' : 'censurar';
+  },
   despistado: (dict, dado) => {
     const bueno = dict.contradiccion ? 'censurar' : dict.exige;
     if (dado() < 0.6) return bueno;
@@ -118,6 +128,14 @@ const fallos = [];
 const o = resumen.obediente;
 if (o.despedidos) fallos.push(`El obediente acaba despedido el ${pct(o.despedidos)} de las veces. Es el techo: no debería caer nunca.`);
 if (o.modelo < CUANTAS) fallos.push(`El obediente solo llega a burócrata modelo el ${pct(o.modelo)} de las veces.`);
+const c = resumen.casi;
+if (c.despedidos > CUANTAS * 0.25) fallos.push(`El que falla una de cada siete acaba despedido el ${pct(c.despedidos)} de las veces: el juego es injusto, no duro.`);
+// El punto más importante de la curva: el jugador de verdad tiene que poder
+// llegar al Final A y no tenerlo garantizado. Si siempre llega, acertar no
+// significa nada; si no llega nunca, el final bueno es decorativo.
+if (c.modelo < CUANTAS * 0.1 || c.modelo > CUANTAS * 0.6) {
+  fallos.push(`El que falla una de cada siete llega a burócrata modelo el ${pct(c.modelo)} de las veces. Debería estar entre el 10 % y el 60 %: ni regalado ni imposible.`);
+}
 const d = resumen.despistado;
 if (d.despedidos === 0) fallos.push('El despistado no cae nunca: sobra margen y el juego no tiene tensión.');
 if (d.despedidos === CUANTAS) fallos.push('El despistado cae siempre: el margen es demasiado estrecho.');

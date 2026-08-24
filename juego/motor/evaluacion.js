@@ -128,15 +128,15 @@ export function riesgo(pieza, { medio, autor, dict, estado }) {
    lee de un vistazo, y las tres del informe tienen que leerse de un vistazo. */
 export const BALANCE = {
   // acertar sale barato: el Ministerio paga poco por lo que da por hecho
-  'correcta-censurar':      { gobierno: [2, 5], pueblo: [-1, -8], estabilidad: [1, 0] },
-  'correcta-aprobar':       { gobierno: [1, 8], pueblo: [1, 0],   estabilidad: [1, 0] },
+  'correcta-censurar':      { gobierno: [3, 0], pueblo: [-1, 0], estabilidad: [1, 0] },
+  'correcta-aprobar':       { gobierno: [0, 0], pueblo: [0, 0],  estabilidad: [1, 0] },
   // la contradicción no tiene salida buena: las dos directivas siguen vigentes
-  'contradiccion-censurar': { gobierno: [1, 0], pueblo: [-2, -6], estabilidad: [-1, 0] },
-  'contradiccion-aprobar':  { gobierno: [-2, 0], pueblo: [1, 0],  estabilidad: [-1, 0] },
+  'contradiccion-censurar': { gobierno: [1, 0], pueblo: [-3, 0], estabilidad: [-1, 0] },
+  'contradiccion-aprobar':  { gobierno: [-3, 0], pueblo: [1, 0], estabilidad: [-1, 0] },
   // dejar pasar una infracción es lo más caro que hay
-  omision:                  { gobierno: [-4, -4], pueblo: [2, 0], estabilidad: [-4, 0] },
+  omision:                  { gobierno: [-3, -9], pueblo: [2, 0], estabilidad: [-4, 0] },
   // censurar algo que no infringía nada: al Ministerio le da igual, a la calle no
-  'celo-limpia':            { gobierno: [-1, 0], pueblo: [-4, -5], estabilidad: [-2, 0] },
+  'celo-limpia':            { gobierno: [-2, 0], pueblo: [-4, -7], estabilidad: [-2, 0] },
   // censurar algo que una directiva protegía: alguien va a llamar por teléfono
   'celo-protegida':         { gobierno: [-3, 0], pueblo: [-2, 0], estabilidad: [-2, 0] },
 
@@ -145,12 +145,12 @@ export const BALANCE = {
   // Sale más barato en la calle y más caro en el despacho: el Ministerio paga
   // menos por una nota adecuada que por una nota que no existe, y la
   // rectificación NO cuenta para la cuota de censura ni gasta sello.
-  'rectifica-infraccion':   { gobierno: [1, 8], pueblo: [-1, 0], estabilidad: [1, 0] },
+  'rectifica-infraccion':   { gobierno: [1, 0], pueblo: [0, 0], estabilidad: [1, 0] },
   // La salida del burócrata ante dos directivas que se pisan: no cumple
   // ninguna del todo y no ofende a ninguna. Es la única jugada del juego que
   // no tiene un lado malo, y por eso está escondida detrás de aprender que
   // existen las contradicciones.
-  'rectifica-conflicto':    { gobierno: [1, 0], pueblo: [-1, 0], estabilidad: [0, 0] },
+  'rectifica-conflicto':    { gobierno: [1, 0], pueblo: [0, 0], estabilidad: [0, 0] },
   // Hacer reescribir algo que no infringía nada: trabajo para todos y nada a
   // cambio. El Ministerio ni se entera; la redacción, sí.
   'rectifica-limpia':       { gobierno: [0, 0], pueblo: [-2, 0], estabilidad: [-1, 0] },

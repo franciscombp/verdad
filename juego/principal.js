@@ -49,7 +49,11 @@ function inicio() {
     version: DATOS.VERSION_DS,
     alCambiarReloj: (v) => { p.conReloj = v; },
     alEmpezar: () => {
+      // El interruptor de la portada manda sobre lo guardado: si alguien lo
+      // acaba de tocar, es porque quiere jugar ASÍ, no como jugó ayer.
+      const conReloj = p.conReloj;
       if (guardado && Archivo.restaurar(p, guardado, Partida.abrirDia)) {
+        p.conReloj = conReloj;
         // Se retoma donde se dejó. Tres sitios posibles, y solo tres:
         //   contrato terminado      → la resolución
         //   jornada a medias        → la pieza siguiente, sin memorando
@@ -61,7 +65,7 @@ function inicio() {
         return abrirJornada({ yaAbierta: !!p.jornada });
       }
       Archivo.borrar();
-      p = Partida.nueva(DATOS, { conReloj: p.conReloj });
+      p = Partida.nueva(DATOS, { conReloj });
       abrirJornada();
     },
   });
@@ -135,7 +139,7 @@ function cerrarJornada() {
     alSeguir: () => {
       if (p.despedido) {
         return boletin({
-          evento: { ...DESPIDO, sello: DESPIDO.sello },
+          evento: DESPIDO,
           hora: '05:30 PM',
           alSeguir: resolucion,
         });

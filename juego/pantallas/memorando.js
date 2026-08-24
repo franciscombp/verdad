@@ -10,12 +10,9 @@
 // ============================================================================
 
 import { html, montar, chrome, membrete, sello } from '../ui/pintar.js';
-import { DIFICULTAD } from '../../datos/reglas.js';
 import { INTERFAZ } from '../../datos/textos.js';
 
 export function memorando({ guion, reglas, alSeguir }) {
-  const nivel = DIFICULTAD[reglas.length] || DIFICULTAD[5];
-
   montar(html`
     <section class="pantalla">
       ${chrome('08:00 AM', 'RED-CENSOR-V3.2')}
@@ -47,7 +44,7 @@ export function memorando({ guion, reglas, alSeguir }) {
           ${INTERFAZ.empezar}
         </button>
         <p class="rotulo" style="text-align:center;margin:0">
-          Nivel de dificultad: ${nivel}${guion.cuota ? ` · Cuota de censura: ${guion.cuota}` : ''}${guion.sellos ? ` · Sellos: ${guion.sellos}` : ''}
+          Nivel de dificultad: ${guion.dificultad}${guion.cuota ? ` · Cuota de censura: ${guion.cuota}` : ''}${guion.sellos ? ` · Sellos: ${guion.sellos}` : ''}
         </p>
       </div>
     </section>`);

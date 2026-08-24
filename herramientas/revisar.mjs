@@ -22,6 +22,7 @@
 // ============================================================================
 
 import { DATOS } from '../datos/index.js';
+
 import { dictamen } from '../juego/motor/evaluacion.js';
 
 const errores = [];
@@ -30,10 +31,11 @@ const err = (m) => errores.push(m);
 const avi = (m) => avisos.push(m);
 
 const vistos = { id: new Map(), expediente: new Map() };
+// Solo los temas que ACUSAN. Los de `salvo` —«oposicion», «minimizada»— son
+// exenciones, y una exención no se subraya: no hay nada que enseñarle al
+// jugador salvo la ausencia del castigo.
 const TEMAS_CALIENTES = new Set(
-  Object.values(DATOS.REGLAS).flatMap((r) => [
-    ...(r.detecta.temas || []), ...((r.salvo && r.salvo.temas) || []),
-  ])
+  Object.values(DATOS.REGLAS).flatMap((r) => r.detecta.temas || [])
 );
 
 for (const guion of DATOS.CAMPANA) {
@@ -42,6 +44,9 @@ for (const guion of DATOS.CAMPANA) {
 
   for (const id of guion.reglas) {
     if (!DATOS.REGLAS[id]) err(`Día ${guion.dia}: la regla «${id}» no existe.`);
+  }
+  if (!DATOS.DIFICULTAD.includes(guion.dificultad)) {
+    err(`Día ${guion.dia}: «${guion.dificultad}» no es una etiqueta de dificultad. Las hay en reglas.js.`);
   }
 
   if (piezas.length !== guion.piezas) {

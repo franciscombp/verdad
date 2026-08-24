@@ -114,6 +114,16 @@ export const FINALES = {
   },
 };
 
+/* ─── posdatas ────────────────────────────────────────────────────────────
+   Notas al pie del informe. Salen cuando el expediente sabe algo que la pieza
+   no dice, y su gracia es el tono: el Ministerio no se sorprende de nada. */
+export const POSDATAS = {
+  buencan: 'El firmante consta como expulsado del territorio nacional. La pieza fue '
+    + 'remitida desde la sala de tránsito de la terminal aérea, dentro del horario '
+    + 'habitual de cierre. Se recuerda que la resolución de expulsión no comprende '
+    + 'el correo electrónico.',
+};
+
 export const CONTRATO = {
   titulo: 'Fin de contrato',
   tramite: 'Resolución oficial del Ministerio',

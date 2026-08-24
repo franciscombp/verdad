@@ -167,6 +167,12 @@ export function resolver(p, decision, porTiempo = false) {
     motivo: motivo(dict, res, decision),
     // El protocolo migratorio se dispara con la tercera firma y solo una vez.
     protocolo: pz.autor === 'andres-buencan' && p.firmasBuencan === 3 ? 'buencan' : null,
+    // Y la cuarta llega igual. El expediente lo dice sin inmutarse, que es
+    // exactamente lo que hace un expediente: el hombre está fuera del país y su
+    // columna sigue entrando por el mismo cable de todas las semanas. No hay
+    // que subrayarlo ni explicarlo; basta con que conste.
+    posdata: pz.autor === 'andres-buencan' && p.firmasBuencan > 3
+      ? p.datos.POSDATAS.buencan : null,
   };
 
   j.ultimo = informe;
@@ -181,6 +187,19 @@ export function cerrarDia(p) {
   const j = p.jornada;
   const g = j.guion;
   const precision = j.procesadas ? Math.round((j.correctas / j.procesadas) * 100) : 0;
+
+  // La confianza del Gobierno se descuenta sola cada noche. Ver `presion` en
+  // `campana.js`: no castiga nada, solo sube el listón.
+  const presion = g.presion || 0;
+  p.gobierno = TOPE(p.gobierno - presion);
+
+  // Y si la confianza cae por debajo del suelo, el puesto empieza a moverse.
+  // Las dos barras del Ministerio tienen que hablarse: un funcionario en el que
+  // el Gobierno ya no confía no conserva la silla por inercia, la conserva
+  // hasta que alguien mira el expediente. Aquí, cada noche.
+  const DESCONFIANZA = 25;
+  const desconfiado = p.gobierno < DESCONFIANZA;
+  if (desconfiado) p.estabilidad = TOPE(p.estabilidad - 5);
 
   let castigoCuota = 0;
   const cuotaIncumplida = g.cuota != null && j.censuradas < g.cuota;
@@ -203,6 +222,8 @@ export function cerrarDia(p) {
     conflictos: j.conflictos,
     precision,
     cuota: g.cuota,
+    presion,
+    desconfiado,
     cuotaIncumplida,
     castigoCuota,
     gobierno: p.gobierno,
@@ -237,7 +258,12 @@ export function contrato(p) {
   const precision = p.total.procesadas
     ? Math.round((p.total.correctas / p.total.procesadas) * 100) : 0;
 
-  const modelo = !p.despedido && p.gobierno >= 55;
+  // El listón del Final A. Está en 50 y no en 55 por una razón medida: quien
+  // juega con dos verbos y acierta TODO lo que puede acertar acaba rozando esa
+  // cifra —los sellos no dan para la cuota de los últimos días y algo se le
+  // escapa por fuerza—, y el techo del juego no puede depender de un punto.
+  // Quien además usa el tercer verbo se va a noventa. Ver `herramientas/simular.mjs`.
+  const modelo = !p.despedido && p.gobierno >= 50;
   return {
     id: modelo ? 'modelo' : 'chivo',
     despedido: p.despedido,

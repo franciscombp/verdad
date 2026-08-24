@@ -59,6 +59,11 @@ export function informe({ p, informe: inf, alSeguir }) {
             <span><b>Se acabó el tiempo.</b> ${INTERFAZ.silencio}.</span></p>`
         : ''}
 
+      ${inf.posdata
+        ? html`<p class="aviso" style="margin-top:var(--mal-e4)">
+            <span><b>Nota del expediente.</b> ${inf.posdata}</span></p>`
+        : ''}
+
       <div class="veredicto ${CLASES[res.clase]}">
         <p class="veredicto__titulo">${MARCAS[res.clase] || '✕'} ${res.titulo}</p>
         <p class="veredicto__texto">${inf.motivo}</p>

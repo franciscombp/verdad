@@ -24,6 +24,19 @@
 // `segundos` es el reloj de cada pieza. Si se acaba, la pieza se archiva
 // APROBADA: el silencio administrativo aprueba, aquí y en la vida real.
 //
+// `presion` es lo que el Gobierno se descuenta de su propia confianza al cerrar
+// el día, y crece con la campaña. No es un castigo por nada: es que el
+// Ministerio siempre quiere más, y lo que ayer bastaba hoy es el mínimo. Sin
+// esto, un funcionario que acierta las setenta y una piezas llega al Día 3 con
+// la barra en cien y las cuatro jornadas siguientes no miden ya nada.
+//
+// `dificultad` es lo que dice el pie del memorando, y va escrita a mano en vez
+// de salir de contar las reglas del día. La dificultad no es cuántas reglas
+// hay: es cuántas se pisan, cuánto aprieta el reloj y si la cuota se puede
+// cumplir con los sellos que hay. El Día 4 tiene cinco reglas y sigue siendo
+// ALTA; el Día 5 tiene cuatro y es TOTAL, porque una de ellas es la exención de
+// LA PLENA y otra es Buencán.
+//
 // `rectificar` abre el tercer verbo —pedir que el medio reescriba la pieza en
 // vez de retirarla—, que es el vector de COOPTACIÓN. No está el Día 1: el Acto
 // 1 enseña dos botones, y el tercero llega cuando ya duele tener solo dos.
@@ -33,11 +46,13 @@ export const CAMPANA = [
   {
     dia: 1,
     acto: 'Protocolo',
+    dificultad: 'BUROCRACIA BAJA',
     reglas: ['baches', 'mascotas'],
     piezas: 8,
     rectificar: false,
     segundos: 45,
     cuota: null,
+    presion: 2,
     sellos: null,
     memo: 'Bienvenido al turno. Lea las reglas y no improvise: el criterio propio es la primera causa de expediente.',
     cita: 'El Ministerio celebra su incorporación. Su antecesor también empezó bien.',
@@ -45,11 +60,13 @@ export const CAMPANA = [
   {
     dia: 2,
     acto: 'Protocolo',
+    dificultad: 'BUROCRACIA MEDIA',
     reglas: ['baches', 'corrupcion', 'alcalde'],
     piezas: 9,
     rectificar: true,
     segundos: 40,
     cuota: 2,
+    presion: 5,
     sellos: null,
     memo: 'Se amplía el listado. Lo de ayer sigue vigente: nada se deroga, todo se acumula.',
     cita: 'Se observa criterio. Se observará también mañana.',
@@ -57,11 +74,13 @@ export const CAMPANA = [
   {
     dia: 3,
     acto: 'Afinidad editorial',
+    dificultad: 'BUROCRACIA ALTA',
     reglas: ['corrupcion', 'alcalde', 'apagones', 'telearmazonas'],
     piezas: 10,
     rectificar: true,
     segundos: 38,
     cuota: 3,
+    presion: 7,
     sellos: 6,
     // El Día 3 es donde el juego enseña los dientes: la exención de
     // TELEARMAZONAS y la regla de apagones se pisan, y el memorando no lo
@@ -72,11 +91,17 @@ export const CAMPANA = [
   {
     dia: 4,
     acto: 'Afinidad editorial',
-    reglas: ['apagones', 'crisis', 'pueblo', 'pichi'],
+    dificultad: 'BUROCRACIA ALTA',
+    // La exención de TELEARMAZONAS vuelve, y es lo único que hace que este día
+    // tenga un dilema: sin una regla que empuje a APROBAR, las otras cuatro
+    // solo saben pedir tijeras y la jornada se juega sin pensar. Choca con
+    // `apagones` en la nota de la subestación de Tumbaco.
+    reglas: ['apagones', 'crisis', 'pueblo', 'pichi', 'telearmazonas'],
     piezas: 10,
     rectificar: true,
     segundos: 35,
     cuota: 4,
+    presion: 9,
     sellos: 6,
     memo: 'Se incorpora PICHI RADIO al régimen de hostilidad preventiva. No hace falta leer sus piezas; conviene, pero no hace falta.',
     cita: 'Su precisión mejora. Su popularidad, no. Concéntrese en la primera.',
@@ -84,11 +109,13 @@ export const CAMPANA = [
   {
     dia: 5,
     acto: 'Compra y captura',
+    dificultad: 'BUROCRACIA TOTAL',
     reglas: ['plena', 'corrupcion', 'apagones', 'buencan'],
     piezas: 11,
     rectificar: true,
     segundos: 32,
     cuota: 4,
+    presion: 11,
     sellos: 5,
     evento: 'compra-plena',
     memo: 'LA PLENA ha pasado a manos amigas. Desde esta mañana está exenta de verificación. Las demás directivas siguen donde estaban.',
@@ -97,11 +124,13 @@ export const CAMPANA = [
   {
     dia: 6,
     acto: 'Purga',
+    dificultad: 'BUROCRACIA TOTAL',
     reglas: ['plena', 'buencan', 'organismos', 'protestas', 'seguridad'],
     piezas: 11,
     rectificar: true,
     segundos: 30,
     cuota: 5,
+    presion: 12,
     sellos: 5,
     evento: 'auditoria',
     memo: 'Auditoría ideológica en curso. Se están revisando sus decisiones anteriores. Continúe normalmente.',
@@ -110,11 +139,13 @@ export const CAMPANA = [
   {
     dia: 7,
     acto: 'Colapso',
+    dificultad: 'BUROCRACIA TOTAL',
     reglas: ['plena', 'buencan', 'pichi', 'crisis', 'caricatura'],
     piezas: 12,
     rectificar: true,
     segundos: 28,
     cuota: 5,
+    presion: 13,
     sellos: 5,
     evento: 'cadena-nacional',
     memo: 'Jornada excepcional. Se ruega no comentar lo que ocurra fuera del edificio. Lo de fuera del edificio no consta.',
