@@ -133,14 +133,15 @@ verdad/
 │   ├── principal.js        el hilo que une las pantallas
 │   ├── estilo.css          lo que un sistema de diseño no puede tener
 │   ├── motor/
-│   │   ├── evaluacion.js     dictamen, riesgo y consecuencias
-│   │   ├── partida.js        el estado y las cinco cosas que se le hacen
+│   │   ├── evaluacion.js     dictamen, riesgo, consecuencias y la tabla de balance
+│   │   ├── partida.js        el estado y las cosas que se le hacen
 │   │   └── archivo.js        guardar el turno
 │   ├── pantallas/          siete pantallas, una por archivo
 │   └── ui/pintar.js        html`` que escapa, y cuatro ayudas más
 └── herramientas/
     ├── traer-ds.mjs      actualizar el sistema de diseño
-    └── revisar.mjs       el corrector de pruebas
+    ├── revisar.mjs       el corrector de pruebas
+    └── simular.mjs       jugar el contrato mil veces sin tocar el ratón
 ```
 
 ### El motor es agnóstico, y se nota en que se puede vaciar
@@ -173,9 +174,10 @@ equivocarse:
   con sus marcas.
 
 Y `node herramientas/simular.mjs` juega el contrato cuatrocientas veces con
-cuatro perfiles —obediente, tijeras, manga ancha y despistado— para comprobar
-que el balance sigue siendo un juego: que el obediente sobrevive siempre, que el
-despistado sobrevive a veces y que censurarlo todo se paga. El balance no se
+cinco perfiles —obediente, astuto, tijeras, manga ancha y despistado— para
+comprobar que el balance sigue siendo un juego: que el obediente sobrevive
+siempre, que el despistado sobrevive a veces, que censurarlo todo se paga en la
+calle y que quien usa el tercer verbo acaba mejor que quien no. El balance no se
 piensa, se mide.
 
 Los dos corren en cada push (`.github/workflows/revisar.yml`).

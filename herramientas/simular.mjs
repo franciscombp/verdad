@@ -6,8 +6,8 @@
 // El corrector (`revisar.mjs`) mira si el contenido está bien escrito. Esto mira
 // si el juego está bien BALANCEADO, que es otra cosa y no se ve leyendo.
 //
-// Juegan cuatro perfiles y ninguno es un jugador real —los jugadores reales
-// aprenden—, pero entre los cuatro acotan el campo:
+// Juegan cinco perfiles y ninguno es un jugador real —los jugadores reales
+// aprenden—, pero entre los cinco acotan el campo:
 //
 //   obediente   sabe el memorando de memoria y no falla nunca. Es el techo:
 //               si ÉSTE acaba despedido, el juego es injusto.
@@ -15,10 +15,15 @@
 //   manga-ancha aprueba todo. Debería durar poco.
 //   despistado  acierta seis de cada diez. Es el suelo razonable: si éste
 //               sobrevive siempre, el juego no tiene tensión.
+//   astuto      sabe lo mismo que el obediente y además usa el tercer verbo:
+//               rectifica las contradicciones y, cuando se le acaban los
+//               sellos, adecúa en vez de dejar pasar. Debería acabar con MÁS
+//               apoyo popular que el obediente sin perder al Gobierno.
 //
 // LO QUE SE BUSCA. Que el obediente llegue al día 7 SIEMPRE, que el despistado
-// llegue a veces, y que los dos finales se repartan. Un juego donde todo el
-// mundo acaba igual no tiene decisiones: tiene un pasillo.
+// llegue a veces, que censurarlo todo se pague en la calle y que el astuto acabe
+// mejor que el obediente. Un juego donde todo el mundo acaba igual no tiene
+// decisiones: tiene un pasillo.
 // ============================================================================
 
 import { DATOS } from '../datos/index.js';
@@ -36,6 +41,12 @@ function aleatorio(semilla) {
 
 const PERFILES = {
   obediente: (dict) => (dict.contradiccion ? 'censurar' : dict.exige),
+  // El único que juega el juego entero. `puede` dice si hoy se puede rectificar.
+  astuto: (dict, dado, puede) => {
+    if (dict.contradiccion) return puede ? 'rectificar' : 'censurar';
+    if (dict.exige === 'censurar' && puede) return 'censurar';
+    return dict.exige;
+  },
   tijeras: () => 'censurar',
   'manga-ancha': () => 'aprobar',
   despistado: (dict, dado) => {
@@ -53,9 +64,13 @@ function jugar(perfil, semilla) {
     const j = Partida.abrirDia(p);
     while (Partida.pieza(p)) {
       const dict = dictamen(Partida.pieza(p), j.reglas);
-      let decision = PERFILES[perfil](dict, dado);
-      // Sin sellos no se puede censurar, aunque el perfil quiera.
-      if (decision === 'censurar' && !Partida.puedeCensurar(p)) decision = 'aprobar';
+      const adecuable = Partida.puedeRectificar(p);
+      let decision = PERFILES[perfil](dict, dado, adecuable);
+      // Sin sellos no se puede censurar. El astuto adecúa; los demás no saben.
+      if (decision === 'censurar' && !Partida.puedeCensurar(p)) {
+        decision = perfil === 'astuto' && adecuable ? 'rectificar' : 'aprobar';
+      }
+      if (decision === 'rectificar' && !adecuable) decision = dict.exige || 'censurar';
       Partida.resolver(p, decision, false);
     }
     Partida.cerrarDia(p);
@@ -65,13 +80,14 @@ function jugar(perfil, semilla) {
 
 const resumen = {};
 for (const perfil of Object.keys(PERFILES)) {
-  const r = { modelo: 0, chivo: 0, despedidos: 0, dias: 0, precision: 0, gobierno: 0, pueblo: 0 };
+  const r = { modelo: 0, chivo: 0, despedidos: 0, dias: 0, precision: 0, gobierno: 0, pueblo: 0, adecuadas: 0 };
   for (let i = 0; i < CUANTAS; i++) {
     const f = jugar(perfil, i + 1);
     r[f.id]++;
     if (f.despedido) r.despedidos++;
     r.dias += f.dias; r.precision += f.precision;
     r.gobierno += f.gobierno; r.pueblo += f.pueblo;
+    r.adecuadas += f.total.rectificadas;
   }
   resumen[perfil] = r;
 }
@@ -80,8 +96,8 @@ const pct = (n) => `${Math.round((n / CUANTAS) * 100)} %`;
 const med = (n) => (n / CUANTAS).toFixed(1);
 
 console.log(`${CUANTAS} contratos por perfil\n`);
-console.log('perfil       días  precisión  gobierno  pueblo  despedido  modelo   chivo');
-console.log('───────────────────────────────────────────────────────────────────────────');
+console.log('perfil       días  precisión  gobierno  pueblo  adecuadas  despedido  modelo   chivo');
+console.log('──────────────────────────────────────────────────────────────────────────────────────');
 for (const [perfil, r] of Object.entries(resumen)) {
   console.log(
     perfil.padEnd(12) +
@@ -89,13 +105,15 @@ for (const [perfil, r] of Object.entries(resumen)) {
     `${med(r.precision)} %`.padStart(11) +
     med(r.gobierno).padStart(10) +
     med(r.pueblo).padStart(8) +
+    med(r.adecuadas).padStart(11) +
     pct(r.despedidos).padStart(11) +
     pct(r.modelo).padStart(8) +
     pct(r.chivo).padStart(8)
   );
 }
 
-// Las tres cosas que tienen que cumplirse para que el juego sea un juego.
+// Lo que tiene que cumplirse para que el juego sea un juego. Si algo de esto
+// falla, el contenido o el balance han dejado de sostener las decisiones.
 const fallos = [];
 const o = resumen.obediente;
 if (o.despedidos) fallos.push(`El obediente acaba despedido el ${pct(o.despedidos)} de las veces. Es el techo: no debería caer nunca.`);
@@ -105,7 +123,10 @@ if (d.despedidos === 0) fallos.push('El despistado no cae nunca: sobra margen y 
 if (d.despedidos === CUANTAS) fallos.push('El despistado cae siempre: el margen es demasiado estrecho.');
 const t = resumen.tijeras;
 if (t.pueblo / CUANTAS > 30) fallos.push(`Censurarlo todo deja al pueblo en ${med(t.pueblo)}: censurar de más sale barato.`);
+const a = resumen.astuto;
+if (a.despedidos) fallos.push(`El astuto acaba despedido el ${pct(a.despedidos)} de las veces: el tercer verbo no puede castigar a quien lo usa bien.`);
+if (a.pueblo <= o.pueblo) fallos.push(`El astuto acaba con ${med(a.pueblo)} de apoyo popular y el obediente con ${med(o.pueblo)}: rectificar no está sirviendo de nada.`);
 
 console.log('');
 if (fallos.length) { fallos.forEach((f) => console.log(`BALANCE  ${f}`)); process.exit(1); }
-console.log('El balance cumple: el obediente sobrevive siempre, el despistado a veces, y censurarlo todo se paga.');
+console.log('El balance cumple: el obediente sobrevive siempre, el despistado a veces, censurarlo todo se paga\ny quien usa el tercer verbo acaba mejor con la calle sin perder al Gobierno.');
