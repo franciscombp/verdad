@@ -17,12 +17,12 @@ export function boletin({ evento, hora = '08:00 AM', alSeguir }) {
     <section class="pantalla boletin">
       ${chrome(hora, 'RED-CENSOR-V3.2')}
       <span class="boletin__sello">${evento.sello}</span>
-      <h1 class="boletin__titulo">${evento.titulo}</h1>
+      <h1 class="boletin__titulo" tabindex="-1" data-foco>${evento.titulo}</h1>
       <div class="boletin__cuerpo">
         ${evento.cuerpo.map((parrafo) => html`<p>${parrafo}</p>`)}
       </div>
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="seguir" data-foco>
+        <button class="btn btn--rojo btn-block" type="button" id="seguir">
           ${evento.boton}
         </button>
       </div>

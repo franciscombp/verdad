@@ -25,7 +25,7 @@ export function portada({ alEmpezar, conReloj, alCambiarReloj, version }) {
       </div>
 
       <div>
-        <h1 class="portada__titulo">${PORTADA.titulo}</h1>
+        <h1 class="portada__titulo" tabindex="-1" data-foco>${PORTADA.titulo}</h1>
         <p class="portada__lema">«${PORTADA.lema}»</p>
       </div>
 

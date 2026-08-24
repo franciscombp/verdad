@@ -59,6 +59,10 @@ export function montar(contenido, { ancha = false } = {}) {
   raiz.scrollIntoView({ block: 'start', behavior: 'instant' });
   window.scrollTo(0, 0);
   if (window.malDS) window.malDS.init(raiz);
+  // El foco va al TITULAR de la pantalla nueva —marcado con `data-foco`—, no a
+  // su botón principal. Enfocar el botón es más rápido para quien ya sabe lo
+  // que va a hacer, pero deja a quien navega con lector de pantalla oyendo
+  // «Aprobar, botón» sin haber oído la noticia. Aquí la lectura es el juego.
   const foco = raiz.querySelector('[data-foco]');
   if (foco) foco.focus({ preventScroll: true });
   return raiz;
@@ -91,7 +95,7 @@ export function membrete(titulo, tramite, rotulo = 'Ministerio de la Verdad y la
   return html`
     <header class="membrete">
       <span class="membrete__rotulo">${rotulo}</span>
-      <h1 class="membrete__titulo">${titulo}</h1>
+      <h1 class="membrete__titulo" tabindex="-1" data-foco>${titulo}</h1>
       ${tramite ? html`<p class="membrete__tramite">${tramite}</p>` : ''}
     </header>`;
 }

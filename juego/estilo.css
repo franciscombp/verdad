@@ -73,6 +73,67 @@
   --t-lento: 450ms;
 }
 
+/* Al cambiar de pantalla, el foco va al TITULAR de la nueva, no a su botón: el
+   jugador tiene que leer antes de decidir, y quien navega con lector de
+   pantalla también. El titular no está en el orden de tabulación
+   (`tabindex="-1"`), así que aquí no hay ningún anillo que quitarle a nadie:
+   solo se le quita el que el navegador dibuja al enfocarlo por código. Los
+   botones siguen enfocándose con Tab y con su anillo intacto. */
+[tabindex="-1"]:focus{ outline: none }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CUATRO HUECOS DEL TEMA DEL PERIÓDICO EN OSCURO
+   ══════════════════════════════════════════════════════════════════════════
+   Esto NO es maquillaje del juego: son huecos del tema del periódico en su
+   modo oscuro, encontrados leyendo `mal.css` entera y comprobados uno a uno.
+   Van aquí porque el juego no puede esperar, y van en `docs/ESTILO.md` bajo
+   «lo que hay que devolverle al sistema» porque el sitio donde deben acabar es
+   el bloque `:root[data-marca="mercio"][data-tema="oscuro"]` de `mal.css`.
+
+   Se arreglan POR TOKEN y en la capa 1, que es como el sistema dice que se
+   hace un tema. Ni un selector de componente tocado.
+
+   1 · LA RAMPA NEUTRA ESTÁ PLANA Y AL REVÉS. El tema declara --ref-n0 #1a1a1a
+       (la página), --ref-n1 #222222, --ref-n2 #141414 y --ref-n3 #1a1a1a. O
+       sea: `--mal-surface` (n2) es MÁS OSCURA que el fondo, y `--mal-surface-alt`
+       (n3) es EXACTAMENTE el fondo — 1,00 : 1. Todo lo que el sistema pinta con
+       «un tono distinto» —la pista de `.progreso`, la cebra de `.tabla`, el
+       `.esqueleto`, la pastilla activa de `.seg`— desaparece. Se reordena la
+       rampa dejando la página donde estaba, que es la que ya cuadra con la
+       maqueta.
+
+   2 · LOS BORDES VALEN CERO PÍXELES. `--ref-borde: 0px` no significa «sin color
+       de borde»: significa que `--mal-borde`, `--mal-borde-fuerte` y
+       `--mal-separador` se computan a CERO. En una página de periódico eso es
+       correcto —la separación la hace el aire—, pero deja a `.tabla` sin rayas
+       entre filas y a `.accordion-item` sin su filete. Con la página oscura, el
+       aire ya no basta: dos bloques del mismo carbón sin raya son un bloque.
+
+   3 · `--ref-acento-linea: 0` DEJA LOS CUATRO AVISOS IGUALES. `.aviso` se marca
+       con un filete de 3 px a la izquierda y sus variantes —`--ok`,
+       `--atencion`, `--peligro`, `--info`— SOLO cambian el color de ese filete.
+       Con el factor a cero no hay filete, así que un aviso de peligro y uno
+       informativo son el mismo párrafo gris. El juego los usa para decir
+       «cuota incumplida» y «se acabó el tiempo», que no son lo mismo.
+
+   4 · `--ref-marca-2` SE QUEDA CON EL VALOR CLARO. El bloque oscuro de mercio
+       no lo redeclara, así que `--mal-primary-hover` vale #141414: el rojo del
+       botón principal se vuelve casi negro al pasar por encima. Aquí se le da
+       su pareja aclarada, que es lo que hace el bloque oscuro genérico.
+
+   LO QUE NO SE TOCA: `--ref-radio` (a escuadra), `--ref-elev-*` (sin sombras),
+   `--ref-salto` y `--ref-presion` (ni salta ni se hunde). Eso no son huecos:
+   es la expresión del periódico, y se adopta entera. Un impreso no rebota.
+   ────────────────────────────────────────────────────────────────────────── */
+:root[data-marca="mercio"][data-tema="oscuro"]{
+  --ref-n1: #262626;        /* el rebaje y el relleno · ahora POR ENCIMA del fondo */
+  --ref-n2: #202020;        /* la superficie · idem */
+  --ref-n3: #2c2c2c;        /* la superficie alterna · distinta del fondo, por fin */
+  --ref-borde: 1px;         /* que los filetes del sistema midan algo */
+  --ref-acento-linea: 1;    /* que un aviso de peligro se distinga de uno de info */
+  --ref-marca-2: #f07a6b;   /* la pareja aclarada del rojo, para el estado activo */
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    LA MESA
    ══════════════════════════════════════════════════════════════════════════ */

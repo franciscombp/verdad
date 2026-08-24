@@ -59,7 +59,7 @@ export function abrirEscritorio({ p, alDecidir }) {
             <span class="pliego__seccion">${pz.seccion} · ${medio.nombre}</span>
             <span class="pliego__fecha">Edición diaria</span>
           </div>
-          <h1 class="pliego__titular">${pz.titular}</h1>
+          <h1 class="pliego__titular" tabindex="-1" data-foco>${pz.titular}</h1>
           <p class="pliego__texto">${subrayar(pz.entradilla, pz.marcas)}</p>
           <p class="pliego__texto" style="color:var(--em-pliego-meta)">Autor: ${autor.nombre}</p>
           <div class="pliego__pie">
@@ -95,7 +95,7 @@ export function abrirEscritorio({ p, alDecidir }) {
         </div>
 
         <article class="pliego">
-          <h1 class="pliego__titular">${pz.titular}</h1>
+          <h1 class="pliego__titular" tabindex="-1" data-foco>${pz.titular}</h1>
           <div class="pliego__cabecera">
             <span class="pliego__seccion">${pz.seccion}</span>
             <span class="pliego__fecha">Autor: ${autor.nombre}</span>
@@ -155,7 +155,7 @@ export function abrirEscritorio({ p, alDecidir }) {
     const sinSellos = !Partida.puedeCensurar(p);
     return html`
       <div class="decidir">
-        <button class="decidir__btn decidir__btn--aprobar" type="button" data-decision="aprobar" data-foco>
+        <button class="decidir__btn decidir__btn--aprobar" type="button" data-decision="aprobar">
           ${INTERFAZ.aprobar}<small>Sellar [A]</small>
         </button>
         <button class="decidir__btn decidir__btn--censurar" type="button" data-decision="censurar"

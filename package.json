@@ -1,0 +1,14 @@
+{
+  "name": "el-censor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "EL MERCIO. presenta: EL CENSOR — juego de decisiones en el Ministerio de la Verdad",
+  "license": "MIT",
+  "scripts": {
+    "revisar": "node herramientas/revisar.mjs",
+    "simular": "node herramientas/simular.mjs",
+    "ds": "node herramientas/traer-ds.mjs",
+    "servir": "python3 -m http.server 8000"
+  }
+}

@@ -53,21 +53,38 @@ token porque el resultado no es «lo mismo pero invertido»:
 | `--ref-borde` | 1px | **`0px`** | **`0px`** — sin líneas |
 | `--mal-ok / warn / danger` | valores de oscuro | *(no los toca)* | los de oscuro |
 
-Dos consecuencias que mandan sobre toda la hoja:
+### Cuatro huecos, y cómo se tapan
 
-**No hay bordes.** `--ref-borde: 0px` hace que `--mal-borde` sea un borde de cero
-píxeles: en el periódico la separación la hace el aire, no una raya. Aquí se
-respeta en todo lo que es lectura —el pliego, los paneles, las tarjetas—.
+Leyendo `mal.css` entera aparecen cuatro cosas que el bloque
+`:root[data-marca="mercio"][data-tema="oscuro"]` no declara y que en una página
+oscura sí hacen falta. El juego las tapa **en la capa 1 y por token** —que es
+como el sistema dice que se hace un tema— en un solo bloque al principio de
+`juego/estilo.css`. Están también en «lo que hay que devolverle al sistema», al
+final de este documento, porque el sitio donde deben acabar es `mal.css`.
 
-**Pero un formulario sin rayas no es un formulario.** La barra del turno, la
-cabecera de un informe y las filas de una tabla del Ministerio son un impreso, no
-una página que se lee. Para eso, y solo para eso, el juego declara `--filete`, que
-sale del color de contorno del sistema (`--mal-outline`) y por tanto sigue al
-tema: lo único que decide el juego es el grosor.
+| Hueco | Qué pasa | Lo que declara el juego |
+|---|---|---|
+| **La rampa neutra está plana y al revés** | `--ref-n2` (#141414) es más oscura que la página (#1a1a1a) y `--ref-n3` es **exactamente** la página: 1,00 : 1. La pista de `.progreso`, la cebra de `.tabla` y el `.esqueleto` desaparecen | `--ref-n1:#262626` · `--ref-n2:#202020` · `--ref-n3:#2c2c2c` |
+| **Los bordes miden cero** | `--ref-borde: 0px` deja `--mal-borde` y `--mal-separador` en `0px solid …`: `.tabla` sin rayas entre filas, `.accordion-item` sin filete | `--ref-borde: 1px` |
+| **Los cuatro avisos son iguales** | `.aviso--ok/--atencion/--peligro/--info` solo cambian el **color** de un filete de 3 px que con `--ref-acento-linea: 0` no existe. Un aviso de peligro y uno informativo son el mismo párrafo gris | `--ref-acento-linea: 1` |
+| **El rojo se vuelve negro al pulsarlo** | `--ref-marca-2` se queda con el valor claro (#141414), así que `--mal-primary-hover` es casi negro | `--ref-marca-2: #f07a6b` |
 
-**No hay sombras ni saltos.** `--ref-elev-*: none`, `--ref-salto: none`,
-`--ref-presion: none`. Un periódico impreso no flota ni rebota, y esto se hereda
-tal cual: en toda la hoja no hay un solo `box-shadow`.
+**En una página blanca, el aire separa. En una página de carbón, no.** Ese es el
+resumen de los dos primeros: el periódico impreso puede permitirse no tener
+líneas porque el papel ya es un fondo distinto de todo lo que hay encima; dos
+bloques del mismo carbón sin una raya entre medias son un bloque.
+
+### Lo que NO se toca
+
+`--ref-radio` (a escuadra), `--ref-elev-1/2` (sin sombras), `--ref-salto` y
+`--ref-presion` (ni salta al pasar por encima ni se hunde al pulsar). Eso no son
+huecos: es **la expresión del periódico**, y se adopta entera. Un impreso no
+rebota, y esto es un impreso aunque sea un juego.
+
+Cuesta algo: en táctil, donde no hay `:hover`, un botón del sistema no confirma
+el toque con nada. Lo que confirma aquí es que la pantalla cambia en 260 ms —y
+en lo único que de verdad importa, los dos botones de decisión, el juego pone su
+propia respuesta (`.decidir__btn.pulsado`), porque son suyos y puede.
 
 ## Los colores no se escriben, se piden
 
@@ -198,7 +215,27 @@ edición. Lo que se comparte es la maqueta y los siete tokens, no el dibujo.
 
 Con él dentro, este juego borraría cincuenta líneas de su hoja.
 
-### 2 · `--ref-marca-rgb`
+### 2 · El bloque oscuro del periódico, completo
+
+Los cuatro huecos de arriba (`--ref-n1/n2/n3`, `--ref-borde`,
+`--ref-acento-linea`, `--ref-marca-2`). Ninguno es de este juego: son del tema,
+y cualquier producto que ponga `data-marca="mercio" data-tema="oscuro"` se los
+va a encontrar iguales. Las siete líneas ya están escritas y probadas; van tal
+cual al bloque `:root[data-marca="mercio"][data-tema="oscuro"]` de `mal.css`.
+
+Y con ellas, dos cosas que sí necesitan más que un token:
+
+- **`--em-franja` es un `#141414` literal en un `:root` sin condición de tema.**
+  La franja de destacados de `.em-dark` se pinta sobre una página #1a1a1a:
+  1,06 : 1. La banda oscura desaparece en el modo oscuro, que es donde más
+  falta hace que se distinga. Se arregla por token declarándolo en el bloque
+  oscuro, y de paso `.em-dark .em-card{border-color:#3a3a3a}` (`mal.css:1555`)
+  debería salir de `--em-border` como todo lo demás.
+- **`::selection` usa el rojo de MAL, no el del periódico.** `mal.css:525`
+  escribe `rgba(214,56,43,.24)` a mano —el #D6382B de la casa— en los cuatro
+  temas. Debería ser `color-mix(in srgb, var(--mal-primary) 24%, transparent)`.
+
+### 3 · `--ref-marca-rgb`
 
 Lo pedía ya Estado de Excepción y sigue haciendo falta. El sistema publica
 `--ref-borde-rgb` para poder graduar el filete, pero no el color de marca. Sin él
@@ -206,14 +243,14 @@ no se puede escribir un rojo al 12 % sin volver a escribir el hexadecimal, que e
 justo lo que los tokens vienen a evitar. Aquí se ha esquivado con `color-mix`,
 que funciona pero es más verboso y no dice lo que quiere decir.
 
-### 3 · Un sello
+### 4 · Un sello
 
 `.sello` —rectángulo torcido, doble filete, letras apretadas— no es de este juego:
 es de cualquier cosa que tenga que parecer un trámite. Un recibo pagado, un
 pedido enviado, un documento caducado. Va con su animación de caída y su variante
 de color por estado.
 
-### 4 · Una barra con rótulo y cifra
+### 5 · Una barra con rótulo y cifra
 
 El sistema tiene `.progreso` (carril + relleno) y `.medidor` (segmentos), pero no
 la fila completa **rótulo a la izquierda · cifra a la derecha · carril debajo**,
@@ -222,7 +259,7 @@ el color derivado del valor: verde por encima de 60, ámbar entre 30 y 60, rojo 
 debajo. Ese último detalle es lo que la hace legible de reojo, y es lo que un
 componente debería traer resuelto.
 
-### 5 · La banda de aviso a sangre
+### 6 · La banda de aviso a sangre
 
 `.vigente` es una franja de color que rompe el margen de la página para ocupar
 todo el ancho. El sistema tiene `.aviso`, que es una caja dentro del flujo. Los

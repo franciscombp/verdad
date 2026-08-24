@@ -43,7 +43,7 @@ export function memorando({ guion, reglas, alSeguir }) {
       </article>
 
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="seguir" data-foco>
+        <button class="btn btn--rojo btn-block" type="button" id="seguir">
           ${INTERFAZ.empezar}
         </button>
         <p class="rotulo" style="text-align:center;margin:0">

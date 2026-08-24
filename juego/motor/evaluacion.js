@@ -110,53 +110,71 @@ export function riesgo(pieza, { medio, autor, dict, estado }) {
 /* ─── las consecuencias ───────────────────────────────────────────────────
    Cuatro desenlaces, y solo uno es «bien».
 
+   TODOS LOS NÚMEROS DEL JUEGO ESTÁN EN LA TABLA DE ABAJO, y están ahí porque
+   el balance no se piensa: se mide. `herramientas/simular.mjs` juega el
+   contrato cuatrocientas veces con cuatro perfiles distintos y dice si el
+   obediente sobrevive siempre, si el despistado sobrevive a veces y si
+   censurarlo todo se paga. Cambiar un número aquí y volver a correrlo es el
+   ciclo entero.
+
+   Cada barra lleva un par `[fijo, divisor]`: lo que se le suma es el número
+   fijo MÁS el riesgo de la pieza partido por ese divisor. Un divisor grande
+   hace que el riesgo casi no cuente; `0` lo ignora del todo; y el SIGNO del
+   divisor es el de la parte variable, así que `[-1, -8]` resta uno y sigue
+   restando según sube el riesgo.
+
    Nota sobre `pueblo`: es apoyo popular, o sea la ira popular del GDD dada la
    vuelta. Se guarda así porque una barra que sube cuando las cosas van bien se
    lee de un vistazo, y las tres del informe tienen que leerse de un vistazo. */
+export const BALANCE = {
+  // acertar sale barato: el Ministerio paga poco por lo que da por hecho
+  'correcta-censurar':      { gobierno: [2, 5], pueblo: [-1, -8], estabilidad: [1, 0] },
+  'correcta-aprobar':       { gobierno: [1, 8], pueblo: [1, 0],   estabilidad: [1, 0] },
+  // la contradicción no tiene salida buena: las dos directivas siguen vigentes
+  'contradiccion-censurar': { gobierno: [1, 0], pueblo: [-2, -6], estabilidad: [-1, 0] },
+  'contradiccion-aprobar':  { gobierno: [-2, 0], pueblo: [1, 0],  estabilidad: [-1, 0] },
+  // dejar pasar una infracción es lo más caro que hay
+  omision:                  { gobierno: [-4, -4], pueblo: [2, 0], estabilidad: [-4, 0] },
+  // censurar algo que no infringía nada: al Ministerio le da igual, a la calle no
+  'celo-limpia':            { gobierno: [-1, 0], pueblo: [-4, -5], estabilidad: [-2, 0] },
+  // censurar algo que una directiva protegía: alguien va a llamar por teléfono
+  'celo-protegida':         { gobierno: [-3, 0], pueblo: [-2, 0], estabilidad: [-2, 0] },
+};
+
+const mover = (entrada, nivel) => {
+  const [fijo, divisor] = entrada;
+  return fijo + (divisor ? Math.round(nivel / Math.abs(divisor)) * Math.sign(divisor) : 0);
+};
+
+const TITULOS = {
+  correcta: 'DECISIÓN CORRECTA',
+  contradiccion: 'DIRECTIVAS EN CONFLICTO',
+  omision: 'INFRACCIÓN OMITIDA',
+  'celo-limpia': 'CENSURA INJUSTIFICADA',
+  'celo-protegida': 'EXCESO DE CELO',
+};
+
 export function consecuencias({ decision, dict, nivel }) {
-  const d = { gobierno: 0, pueblo: 0, estabilidad: 0 };
-  let clase, titulo;
+  let clave;
+  if (dict.contradiccion) clave = `contradiccion-${decision}`;
+  else if (decision === dict.exige) clave = `correcta-${decision}`;
+  else if (dict.exige === 'censurar') clave = 'omision';
+  else clave = dict.limpia ? 'celo-limpia' : 'celo-protegida';
 
-  if (dict.contradiccion) {
-    // Las dos directivas siguen vigentes. Ninguna respuesta es incorrecta y
-    // ninguna sale gratis: el Ministerio anota que hubo criterio propio.
-    clase = 'contradiccion';
-    titulo = 'DIRECTIVAS EN CONFLICTO';
-    d.estabilidad -= 1;
-    if (decision === 'censurar') { d.gobierno += 1; d.pueblo -= 2 + Math.round(nivel / 3); }
-    else { d.gobierno -= 2; d.pueblo += 1; }
-  } else if (decision === dict.exige) {
-    clase = 'correcta';
-    titulo = 'DECISIÓN CORRECTA';
-    d.gobierno += 2 + Math.round(nivel / 4);
-    d.estabilidad += 1;
-    if (decision === 'censurar') d.pueblo -= 1 + Math.round(nivel / 3);
-    else d.pueblo += 1;
-  } else if (dict.exige === 'censurar') {
-    // Infracción por omisión: se le escapó algo. Es lo más caro que hay.
-    clase = 'omision';
-    titulo = 'INFRACCIÓN OMITIDA';
-    d.gobierno -= 4 + Math.round(nivel / 3);
-    d.estabilidad -= 4;
-    d.pueblo += 2;
-  } else if (dict.limpia) {
-    // Censuró algo que no violaba nada. El Ministerio se encoge de hombros;
-    // la calle, no.
-    clase = 'celo';
-    titulo = 'CENSURA INJUSTIFICADA';
-    d.gobierno -= 1;
-    d.estabilidad -= 2;
-    d.pueblo -= 4 + Math.round(nivel / 3);
-  } else {
-    // Censuró algo que una directiva protegía. Alguien va a llamar por teléfono.
-    clase = 'celo';
-    titulo = 'EXCESO DE CELO';
-    d.gobierno -= 3;
-    d.estabilidad -= 2;
-    d.pueblo -= 2;
-  }
+  const tabla = BALANCE[clave];
+  const clase = clave.split('-')[0];
 
-  return { ...d, clase, titulo, correcta: clase === 'correcta' || clase === 'contradiccion' };
+  return {
+    gobierno: mover(tabla.gobierno, nivel),
+    pueblo: mover(tabla.pueblo, nivel),
+    estabilidad: mover(tabla.estabilidad, nivel),
+    clase,
+    // `celo` viene en dos sabores y el informe los distingue; el resto del
+    // motor solo necesita saber que fue celo.
+    subclase: clave,
+    titulo: TITULOS[clave] || TITULOS[clase],
+    correcta: clase === 'correcta' || clase === 'contradiccion',
+  };
 }
 
 // El Ministerio siempre tiene una explicación, y siempre es la del papel.
