@@ -22,11 +22,11 @@ const CLASES = {
   celo: 'veredicto--falla',
 };
 
-// Lo que dice el sello de caucho según lo que se hizo con la pieza.
+// Lo que dice el sello de caucho, y con qué tinta, según lo que se hizo.
 const SELLOS = {
-  aprobar: ['Aprobado', true],
-  censurar: ['Censurado', false],
-  rectificar: ['Adecuado', false],
+  aprobar: ['Aprobado', 'ok'],
+  censurar: ['Censurado', ''],
+  rectificar: ['Adecuado', 'info'],
 };
 
 // El signo que abre el veredicto. No es decoración: es lo primero que se lee y
@@ -36,7 +36,7 @@ const MARCAS = { correcta: '✓', contradiccion: '≠', rectifica: '±', omision
 export function informe({ p, informe: inf, alSeguir }) {
   const pz = inf.pieza;
   const res = inf.resultado;
-  const [textoSello, selloBueno] = SELLOS[inf.decision] || SELLOS.aprobar;
+  const [textoSello, tintaSello] = SELLOS[inf.decision] || SELLOS.aprobar;
 
   montar(html`
     <section class="pantalla">
@@ -51,7 +51,7 @@ export function informe({ p, informe: inf, alSeguir }) {
         <h2 class="pliego__titular">${pz.titular}</h2>
         <p class="pliego__texto" style="color:var(--em-pliego-txt-2)">${subrayar(recortar(pz.entradilla), pz.marcas)}</p>
         ${sello(textoSello, inf.porTiempo ? 'Silencio administrativo' : 'Puesto #9921-K',
-                { ok: selloBueno, cae: true, flotante: true })}
+                { tinta: tintaSello, cae: true, flotante: true })}
       </article>
 
       ${inf.porTiempo

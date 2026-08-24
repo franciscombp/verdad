@@ -141,10 +141,13 @@ export function medida(rotulo, valor, { invertido = false } = {}) {
     </div>`;
 }
 
-// Un sello de caucho. `cae` lo hace aterrizar.
-export function sello(texto, pie, { ok = false, cae = false, flotante = false } = {}) {
+/* Un sello de caucho. `cae` lo hace aterrizar y `tinta` elige el color del
+   caucho: rojo por defecto (retirar), verde (dejar pasar), azul (adecuar). Son
+   tres actos distintos y el sello es lo primero que se ve del informe: si los
+   tres salieran del mismo tampón, habría que leer para saber qué se hizo. */
+export function sello(texto, pie, { tinta = '', cae = false, flotante = false } = {}) {
   return html`
-    <span class="sello ${ok ? 'sello--ok' : ''} ${cae ? 'sello--cae' : ''} ${flotante ? 'sello--flotante' : ''}">
+    <span class="sello ${tinta ? `sello--${tinta}` : ''} ${cae ? 'sello--cae' : ''} ${flotante ? 'sello--flotante' : ''}">
       <span class="sello__grande">${texto}</span>
       ${pie ? html`<span class="sello__chico">${pie}</span>` : ''}
     </span>`;

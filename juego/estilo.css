@@ -386,6 +386,7 @@ body{
 .sello__grande{ font-size: clamp(15px, 3.4vw, 21px) }
 .sello__chico{ font-size: 8px; font-weight: 600; letter-spacing: .1em; opacity: .8 }
 .sello--ok{ color: var(--mal-ok) }
+.sello--info{ color: var(--mal-info) }
 .sello--flotante{ position: absolute; right: var(--mal-e4); bottom: var(--mal-e4) }
 .sello--cae{ animation: cae var(--t-medio) var(--golpe) both }
 @keyframes cae{
