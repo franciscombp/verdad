@@ -59,7 +59,7 @@ export function informe({ p, informe: inf, alSeguir }) {
       </div>
 
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="seguir">
+        <button class="btn btn--rojo btn-block" type="button" id="seguir" data-avanzar>
           ${Partida.quedan(p) > 0 ? `${INTERFAZ.continuar} · quedan ${Partida.quedan(p)}` : 'Cerrar la jornada'}
         </button>
       </div>

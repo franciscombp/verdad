@@ -30,7 +30,7 @@ export function portada({ alEmpezar, conReloj, alCambiarReloj, version }) {
       </div>
 
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="empezar">
+        <button class="btn btn--rojo btn-block" type="button" id="empezar" data-avanzar>
           ${PORTADA.entrar}
         </button>
         <p style="margin:0;display:flex;justify-content:center">

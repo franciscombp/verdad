@@ -33,6 +33,7 @@ político**.
 | **S** | Censurarla |
 | **E** | Abrir o cerrar la lectura expandida |
 | **Esc** | Volver al escritorio |
+| **Enter** | Continuar, en todo lo que no es el escritorio |
 
 El reloj **no se para al expandir**. Si se parara, leer sería gratis y no habría
 decisión: se abriría todo. Cuando se acaba, la pieza **se archiva aprobada** — el
@@ -158,7 +159,21 @@ equivocarse:
 - ids y expedientes únicos, autores que escriben donde deben, temas que cuadran
   con sus marcas.
 
-Corre en cada push antes de publicar. Un error rompe el despliegue.
+Y `node herramientas/simular.mjs` juega el contrato cuatrocientas veces con
+cuatro perfiles —obediente, tijeras, manga ancha y despistado— para comprobar
+que el balance sigue siendo un juego: que el obediente sobrevive siempre, que el
+despistado sobrevive a veces y que censurarlo todo se paga. El balance no se
+piensa, se mide.
+
+Los dos corren en cada push (`.github/workflows/revisar.yml`).
+
+### Cómo se publica
+
+GitHub Pages sirve la rama `main` **tal cual** — Settings → Pages → Source:
+«Deploy from a branch». No hay paso de compilación porque no hay nada que
+compilar, así que lo que está publicado es byte a byte lo que hay en el
+repositorio. El `.nojekyll` de la raíz es lo único que hace falta para que Pages
+no intente procesarlo.
 
 ---
 

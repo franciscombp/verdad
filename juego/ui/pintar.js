@@ -44,6 +44,30 @@ export const $$ = (sel, raiz = document) => Array.from(raiz.querySelectorAll(sel
 
 const escena = () => document.getElementById('escena');
 
+/* El Enter de las pantallas de trámite. Todo lo que no es el escritorio termina
+   en un botón que dice «continuar», y sin esto había que llegar a él con el
+   ratón o con dos tabuladores: el juego se decide con dos teclas y luego te
+   obligaba a soltar el teclado nueve veces por jornada.
+
+   Vive aquí, en `montar`, y no en cada pantalla, porque lo que hay que
+   garantizar es que solo haya UNA escucha viva — la de la pantalla que está
+   puesta—. Colgarla en siete sitios era colgarla siete veces. */
+let atajoEnter = null;
+function ponAtajo(raiz) {
+  if (atajoEnter) { document.removeEventListener('keydown', atajoEnter); atajoEnter = null; }
+  const boton = raiz.querySelector('[data-avanzar]');
+  if (!boton) return;
+  atajoEnter = (e) => {
+    if (e.key !== 'Enter' || e.metaKey || e.ctrlKey || e.altKey) return;
+    // Si el foco ya está en algo pulsable, Enter es suyo: no se le roba.
+    const t = document.activeElement;
+    if (t && t.closest('button, a, input, select, textarea, summary')) return;
+    e.preventDefault();
+    boton.click();
+  };
+  document.addEventListener('keydown', atajoEnter);
+}
+
 /* Vacía la escena y pinta una pantalla. Devuelve el nodo por si quien la pinta
    necesita colgarle escuchas.
 
@@ -59,6 +83,7 @@ export function montar(contenido, { ancha = false } = {}) {
   raiz.scrollIntoView({ block: 'start', behavior: 'instant' });
   window.scrollTo(0, 0);
   if (window.malDS) window.malDS.init(raiz);
+  ponAtajo(raiz);
   // El foco va al TITULAR de la pantalla nueva —marcado con `data-foco`—, no a
   // su botón principal. Enfocar el botón es más rápido para quien ya sabe lo
   // que va a hacer, pero deja a quien navega con lector de pantalla oyendo

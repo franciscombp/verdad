@@ -63,7 +63,7 @@ export function contrato({ resolucion, alReiniciar }) {
       </div>
 
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="reiniciar">
+        <button class="btn btn--rojo btn-block" type="button" id="reiniciar" data-avanzar>
           ${CONTRATO.reiniciar}
         </button>
       </div>

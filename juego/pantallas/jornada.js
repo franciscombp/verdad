@@ -46,7 +46,7 @@ export function jornada({ reporte, alSeguir }) {
       <p class="dictamen">${reporte.cita}</p>
 
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="seguir">
+        <button class="btn btn--rojo btn-block" type="button" id="seguir" data-avanzar>
           ${reporte.ultimo ? 'Ver la resolución' : `${INTERFAZ.continuar} · Día ${reporte.dia + 1}`}
         </button>
       </div>

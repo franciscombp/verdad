@@ -22,7 +22,7 @@ export function boletin({ evento, hora = '08:00 AM', alSeguir }) {
         ${evento.cuerpo.map((parrafo) => html`<p>${parrafo}</p>`)}
       </div>
       <div class="acciones">
-        <button class="btn btn--rojo btn-block" type="button" id="seguir">
+        <button class="btn btn--rojo btn-block" type="button" id="seguir" data-avanzar>
           ${evento.boton}
         </button>
       </div>

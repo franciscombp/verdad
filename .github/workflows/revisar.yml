@@ -1,0 +1,58 @@
+# ============================================================================
+# Corregir pruebas
+# ============================================================================
+# El único paso automático que tiene el proyecto, y no compila nada: comprueba
+# que la capa de datos está bien escrita. Marcas que no aparecen en su texto,
+# días que piden más censuras de las que hay, contradicciones que faltan, ids
+# repetidos. Ver `herramientas/revisar.mjs`.
+#
+# NO HAY PASO DE PUBLICACIÓN, y es a propósito. GitHub Pages sirve la rama
+# `main` tal cual —Settings → Pages → Source: «Deploy from a branch»—, que es
+# todo lo que hace falta cuando el sitio es HTML, CSS y módulos ES sin compilar.
+# Lo que se publica es byte a byte lo que hay en el repositorio, que es también
+# lo que se ve al abrir `index.html` con dos clics.
+#
+# Si algún día interesa que un fallo del corrector IMPIDA publicar, hay que
+# cambiar la fuente de Pages a «GitHub Actions» y añadir aquí un job con
+# `actions/configure-pages`, `actions/upload-pages-artifact` (path: `.`) y
+# `actions/deploy-pages`, con `needs: revisar`. Mientras la fuente sea la rama,
+# ese job fallaría en cada push.
+# ============================================================================
+
+name: Revisar los datos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: revisar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    name: Corregir pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No hay dependencias que instalar: son dos módulos ES sueltos.
+      - name: Corregir pruebas
+        run: node herramientas/revisar.mjs
+
+      # Cuatro perfiles juegan el contrato entero y se comprueba que el
+      # obediente sobrevive siempre, el despistado a veces, y que censurarlo
+      # todo se paga. Si un cambio de balance rompe eso, sale aquí.
+      - name: Medir el balance
+        run: node herramientas/simular.mjs 200
