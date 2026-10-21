@@ -112,7 +112,7 @@ export function riesgo(pieza, { medio, autor, dict, estado }) {
 
    TODOS LOS NÚMEROS DEL JUEGO ESTÁN EN LA TABLA DE ABAJO, y están ahí porque
    el balance no se piensa: se mide. `herramientas/simular.mjs` juega el
-   contrato cuatrocientas veces con cuatro perfiles distintos y dice si el
+   contrato cuatrocientas veces con siete perfiles distintos y dice si el
    obediente sobrevive siempre, si el despistado sobrevive a veces y si
    censurarlo todo se paga. Cambiar un número aquí y volver a correrlo es el
    ciclo entero.

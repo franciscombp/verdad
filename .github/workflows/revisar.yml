@@ -51,8 +51,9 @@ jobs:
       - name: Corregir pruebas
         run: node herramientas/revisar.mjs
 
-      # Cuatro perfiles juegan el contrato entero y se comprueba que el
-      # obediente sobrevive siempre, el despistado a veces, y que censurarlo
-      # todo se paga. Si un cambio de balance rompe eso, sale aquí.
+      # Siete perfiles juegan el contrato entero y se comprueba que el
+      # obediente sobrevive siempre, el despistado a veces, que censurarlo
+      # todo se paga y que el Final C solo llega a quien lo busca. Si un
+      # cambio de balance rompe eso, sale aquí.
       - name: Medir el balance
         run: node herramientas/simular.mjs 200

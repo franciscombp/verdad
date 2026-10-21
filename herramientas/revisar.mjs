@@ -19,6 +19,9 @@
 // culpa de nadie. El motor lo permite —hay días en que los sellos no llegan a
 // la cuota y eso es diseño—, pero tiene que ser una decisión escrita, no un
 // descuido del contenido.
+//
+// Y LO TERCERO: los encargos del Final C. Cada esquina doblada tiene que llegar
+// el día que la nota dice y tiene que ser algo que el memorando manda retirar.
 // ============================================================================
 
 import { DATOS } from '../datos/index.js';
@@ -106,6 +109,21 @@ for (const guion of DATOS.CAMPANA) {
     if (d.limpia) cuenta.limpias++;
   }
 
+  // ── el encargo de R. ─────────────────────────────────────────────────
+  // Cada esquina doblada tiene que estar ese día y el memorando tiene que
+  // pedir retirarla sin discusión. Si no existe, la nota señala algo que no
+  // llega y el Final C pierde un encargo sin que nadie lo vea; si el memorando
+  // ya mandaba aprobarla —o la pieza cae en una contradicción—, dejarla salir
+  // no le cuesta nada al funcionario y la filtración no cuenta.
+  for (const exp of guion.encargo?.expedientes || []) {
+    const pz = piezas.find((x) => x.expediente === exp);
+    if (!pz) { err(`Día ${guion.dia}: el encargo señala ${exp} y ese día no llega.`); continue; }
+    const d = dictamen(pz, reglas);
+    if (d.contradiccion || d.exige !== 'censurar') {
+      err(`Día ${guion.dia}: el encargo señala ${exp} y el memorando no pide retirarlo: filtrarlo no costaría nada.`);
+    }
+  }
+
   // ── ¿el día se puede jugar? ──────────────────────────────────────────
   const censurables = cuenta.censurar + cuenta.conflicto;
   if (guion.cuota != null && censurables < guion.cuota) {
@@ -130,6 +148,11 @@ for (const guion of DATOS.CAMPANA) {
     ` · reglas: ${guion.reglas.join(', ')}` +
     (Math.max(cuenta.censurar, cuenta.aprobar) / total > 0.8 ? '   ⚠ desequilibrado' : '')
   );
+}
+
+const encargos = DATOS.CAMPANA.reduce((n, g) => n + (g.encargo?.expedientes.length || 0), 0);
+if (DATOS.FILTRADOR && encargos < DATOS.FILTRADOR.umbral) {
+  err(`Hay ${encargos} esquinas dobladas en toda la campaña y el Final C pide ${DATOS.FILTRADOR.umbral}: es un final que no se puede jugar.`);
 }
 
 console.log('');

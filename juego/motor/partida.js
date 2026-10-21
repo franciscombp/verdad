@@ -34,6 +34,7 @@ export function nueva(datos, opciones = {}) {
     estabilidad: datos.INICIO.estabilidad,
     paranoia: 0,                  // sube con cada infracción; entra en el riesgo
     firmasBuencan: 0,             // el protocolo se dispara a la tercera
+    filtradas: 0,                 // esquinas dobladas que salieron a sabiendas
     jornada: null,
     historial: [],                // un reporte por día cerrado
     total: { procesadas: 0, correctas: 0, omitidas: 0, censuradas: 0, rectificadas: 0 },
@@ -64,10 +65,20 @@ export function abrirDia(p) {
     rectificadas: 0,
     injustificadas: 0,
     conflictos: 0,
+    filtradas: 0,
     delta: { gobierno: 0, pueblo: 0, estabilidad: 0 },
     ultimo: null,
   };
   return p.jornada;
+}
+
+/* ¿Esta pieza trae la esquina doblada? Es el encargo del día —ver `encargo` en
+   `campana.js`—, y el escritorio lo enseña porque el funcionario lo VE: una
+   esquina doblada no es una pista oculta, es una pista que el Ministerio no
+   mira. */
+export function encargada(p, pz = pieza(p)) {
+  const e = p.jornada?.guion.encargo;
+  return !!(pz && e && e.expedientes.includes(pz.expediente));
 }
 
 export function pieza(p) {
@@ -156,6 +167,17 @@ export function resolver(p, decision, porTiempo = false) {
   if (decision === 'rectificar') { j.rectificadas++; p.total.rectificadas++; }
   if (pz.autor === 'andres-buencan') p.firmasBuencan++;
 
+  // LA FILTRACIÓN. Una esquina doblada que se aprueba A MANO y contra el
+  // memorando. Las tres condiciones cuentan: si se deja correr el reloj no es
+  // a sabiendas, es silencio administrativo; si se rectifica ya no es la pieza
+  // que alguien quería que saliera; y si el memorando ese día no pedía
+  // retirarla —una contradicción, una exención— no se le está haciendo ningún
+  // favor a nadie. Al Ministerio esto le llega como lo que es para él: una
+  // omisión más, cobrada arriba como todas.
+  const filtrada = encargada(p, pz) && decision === 'aprobar' && !porTiempo
+    && res.clase === 'omision';
+  if (filtrada) { j.filtradas++; p.filtradas++; }
+
   const informe = {
     pieza: pz,
     medio, autor,
@@ -164,6 +186,7 @@ export function resolver(p, decision, porTiempo = false) {
     nivel,
     esperado: esperado(dict),
     resultado: res,
+    filtrada,
     motivo: motivo(dict, res, decision),
     // El protocolo migratorio se dispara con la tercera firma y solo una vez.
     protocolo: pz.autor === 'andres-buencan' && p.firmasBuencan === 3 ? 'buencan' : null,
@@ -249,10 +272,12 @@ export function cerrarDia(p) {
 }
 
 /* ─── el final ────────────────────────────────────────────────────────────
-   Dos, los del alcance jugable. El tercero —el filtrador, quien empieza a
-   aprobar pequeñas verdades— pide una mecánica que esta versión no tiene:
-   aprobar a sabiendas y que eso cuente para algo. La estructura ya lo admite;
-   lo que falta es el juego, no el hueco. */
+   Tres. El A y el B los deciden las barras del Ministerio; el C —el
+   filtrador— lo decide algo que el Ministerio no cuenta: cuántas esquinas
+   dobladas salieron a sabiendas. Va primero porque es el único que pide haber
+   hecho algo a propósito, y pide haber llegado al final: a un funcionario
+   despedido no le queda puesto desde el que dejar salir nada, y su historia
+   la escribe el comunicado del Ministerio, no la fotocopiadora. */
 export function contrato(p) {
   const dias = p.historial.length;
   const precision = p.total.procesadas
@@ -264,8 +289,17 @@ export function contrato(p) {
   // escapa por fuerza—, y el techo del juego no puede depender de un punto.
   // Quien además usa el tercer verbo se va a noventa. Ver `herramientas/simular.mjs`.
   const modelo = !p.despedido && p.gobierno >= 50;
+  // Y pide que se note que fue a propósito. Las esquinas dobladas que salen
+  // tienen que ser LA MAYORÍA de lo que se le escapó al funcionario: quien deja
+  // pasar de todo también deja pasar alguna esquina, y eso no es filtrar, es
+  // no mirar. R. no busca a alguien que se equivoque; busca a alguien que
+  // elija. El Ministerio cuenta errores; esto cuenta un patrón.
+  const umbral = p.datos.FILTRADOR?.umbral ?? Infinity;
+  const otras = p.total.omitidas - p.filtradas;
+  const filtrador = !p.despedido && p.filtradas >= umbral && otras < p.filtradas;
   return {
-    id: modelo ? 'modelo' : 'chivo',
+    id: filtrador ? 'filtrador' : modelo ? 'modelo' : 'chivo',
+    filtradas: p.filtradas,
     despedido: p.despedido,
     dias,
     precision,

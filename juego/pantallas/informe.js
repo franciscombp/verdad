@@ -11,7 +11,7 @@
 // ============================================================================
 
 import { html, montar, chrome, membrete, sello, subrayar } from '../ui/pintar.js';
-import { INTERFAZ } from '../../datos/textos.js';
+import { INTERFAZ, ENCARGO } from '../../datos/textos.js';
 import * as Partida from '../motor/partida.js';
 
 const CLASES = {
@@ -57,6 +57,11 @@ export function informe({ p, informe: inf, alSeguir }) {
       ${inf.porTiempo
         ? html`<p class="aviso aviso--atencion" style="margin-top:var(--mal-e4)">
             <span><b>Se acabó el tiempo.</b> ${INTERFAZ.silencio}.</span></p>`
+        : ''}
+
+      ${inf.filtrada
+        ? html`<p class="aviso aviso--info" style="margin-top:var(--mal-e4)">
+            <span><b>${ENCARGO.esquina}.</b> ${ENCARGO.salio}</span></p>`
         : ''}
 
       ${inf.posdata

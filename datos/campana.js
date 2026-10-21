@@ -40,6 +40,17 @@
 // `rectificar` abre el tercer verbo —pedir que el medio reescriba la pieza en
 // vez de retirarla—, que es el vector de COOPTACIÓN. No está el Día 1: el Acto
 // 1 enseña dos botones, y el tercero llega cuando ya duele tener solo dos.
+//
+// `encargo` es la nota sin membrete que aparece dentro de la carpeta del
+// memorando desde el Día 3: alguien del edificio ha doblado la esquina de una
+// pieza que el memorando manda retirar y le pide al funcionario que la deje
+// salir. Es el FINAL FILTRADOR, y la única mecánica del juego que mira la
+// intención: aprobar esa pieza sigue siendo una infracción omitida —el
+// Ministerio la cobra igual—, pero además consta, en un sitio que el
+// Ministerio no lee, que se aprobó a sabiendas. El corrector comprueba que cada
+// expediente encargado exista ese día y que el memorando pida retirarlo: un
+// encargo que se cumple aprobando lo que ya había que aprobar no le cuesta nada
+// a nadie, y entonces no es un encargo.
 // ============================================================================
 
 export const CAMPANA = [
@@ -87,6 +98,10 @@ export const CAMPANA = [
     // menciona. Nadie va a avisar de que hay una contradicción.
     memo: 'A partir de hoy se evalúa también el TONO. Una nota puede cumplir cada regla y seguir siendo desleal.',
     cita: 'El Ministerio nota su esfuerzo diario. Sin embargo, persisten murmullos en el distrito sur sobre censuras injustificadas.',
+    encargo: {
+      expedientes: ['DOCUMENTO_M_13476'],
+      nota: 'Usted no me conoce. Yo a usted sí: lleva dos días sellando sin levantar la vista. Hoy entra lo del pescado de Esmeraldas y le he doblado la esquina. Si sale, alguien lo lee. Si no sale, no pasa nada: nadie lo sabrá nunca, tampoco yo.',
+    },
   },
   {
     dia: 4,
@@ -105,6 +120,10 @@ export const CAMPANA = [
     sellos: 6,
     memo: 'Se incorpora PICHI RADIO al régimen de hostilidad preventiva. No hace falta leer sus piezas; conviene, pero no hace falta.',
     cita: 'Su precisión mejora. Su popularidad, no. Concéntrese en la primera.',
+    encargo: {
+      expedientes: ['DOCUMENTO_C_77120'],
+      nota: 'Lo de Pomasqui. Veintiún días de tanquero. Esquina doblada, como ayer, haya hecho usted ayer lo que haya hecho.',
+    },
   },
   {
     dia: 5,
@@ -120,6 +139,10 @@ export const CAMPANA = [
     evento: 'compra-plena',
     memo: 'LA PLENA ha pasado a manos amigas. Desde esta mañana está exenta de verificación. Las demás directivas siguen donde estaban.',
     cita: 'La adquisición ha sido un éxito. El Ministerio no comenta el precio.',
+    encargo: {
+      expedientes: ['DOCUMENTO_G_41207'],
+      nota: 'La de las luminarias. Ya sé que hoy no le alcanzan los sellos para la cuota. Precisamente: uno menos que gastar.',
+    },
   },
   {
     dia: 6,
@@ -135,6 +158,10 @@ export const CAMPANA = [
     evento: 'auditoria',
     memo: 'Auditoría ideológica en curso. Se están revisando sus decisiones anteriores. Continúe normalmente.',
     cita: 'La auditoría no ha concluido. Nunca concluye.',
+    encargo: {
+      expedientes: ['DOCUMENTO_C_30877'],
+      nota: 'Le están auditando. Lo sé porque a mí también. La del puesto ciento doce lleva la esquina doblada; si hoy no puede, lo entiendo.',
+    },
   },
   {
     dia: 7,
@@ -150,6 +177,10 @@ export const CAMPANA = [
     evento: 'cadena-nacional',
     memo: 'Jornada excepcional. Se ruega no comentar lo que ocurra fuera del edificio. Lo de fuera del edificio no consta.',
     cita: 'Gracias por su servicio. La resolución de su contrato se comunicará al cierre.',
+    encargo: {
+      expedientes: ['DOCUMENTO_T_28703'],
+      nota: 'El Banco Central lo retiró a las cinco de la tarde. Usted lo tiene a las once de la mañana. Es la última que le pido.',
+    },
   },
 ];
 
@@ -159,3 +190,10 @@ export const INICIO = {
   pueblo: 55,        // apoyo del pueblo · lo contrario de la ira popular
   estabilidad: 70,   // estabilidad laboral · tu supervivencia en el cargo
 };
+
+// Cuántas esquinas dobladas hay que dejar salir, a sabiendas, para que el
+// contrato acabe en el Final C. Son cinco encargos y se perdona uno: con tres,
+// el que falla una de cada siete llegaba aquí de rebote alguna vez, y un final
+// que se alcanza sin buscarlo no dice nada de quien lo alcanza. Lo mide
+// `herramientas/simular.mjs`.
+export const FILTRADOR = { umbral: 4 };

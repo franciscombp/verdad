@@ -86,10 +86,12 @@ export const EVENTOS = {
   },
 };
 
-/* ─── los dos finales ─────────────────────────────────────────────────────
-   El GDD trae tres. El tercero —el filtrador— pide una mecánica que esta
-   versión no tiene y por eso no está: un final que no se puede jugar no es un
-   final, es un texto. */
+/* ─── los tres finales ────────────────────────────────────────────────────
+   El A y el B los decide el Ministerio con sus barras. El C no lo decide: lo
+   decide cuántas esquinas dobladas dejó salir el funcionario a sabiendas, y el
+   Ministerio no se entera nunca de que fue eso —para él son omisiones, una
+   detrás de otra, y las cobra como tales—. Por eso el texto del C no habla del
+   expediente: habla de lo que pasó fuera del edificio. */
 export const FINALES = {
   modelo: {
     titulo: 'Final A · Burócrata modelo',
@@ -112,6 +114,32 @@ export const FINALES = {
       + 'firma más rápido, y las mismas piezas que usted retiró se retiran otra vez, con '
       + 'la misma directiva y otro nombre debajo.',
   },
+  filtrador: {
+    titulo: 'Final C · Filtrador',
+    icono: 'periodico',
+    bueno: true,
+    resumen: 'Algunas esquinas venían dobladas.',
+    texto: 'Su expediente cierra con varias omisiones y ninguna explicación. Nadie las '
+      + 'relaciona entre sí: eran unas pocas entre setenta, y el Ministerio cuenta errores, '
+      + 'no patrones. Un martes, en la fotocopiadora de una facultad, alguien grapa las '
+      + 'piezas que usted dejó salir y las deja en la cafetería. No le llega nada a cambio. '
+      + 'Tampoco vuelve a encontrar una nota firmada con una R.',
+  },
+};
+
+/* ─── el encargo ──────────────────────────────────────────────────────────
+   La nota sin membrete que aparece en la carpeta del memorando desde el Día 3,
+   y lo que se ve de ella después. Es la única voz del juego que no es la del
+   Ministerio, y por eso es la única que tutea al riesgo y no a la norma. El
+   texto de cada día está en `campana.js`, junto al expediente que señala. */
+export const ENCARGO = {
+  rotulo: 'Nota sin membrete · dentro de la carpeta',
+  firma: 'R.',
+  esquina: 'Esquina doblada',
+  // Lo que dice el informe cuando la pieza encargada sale aprobada a mano. El
+  // veredicto de encima sigue diciendo INFRACCIÓN OMITIDA, y tiene que seguir
+  // diciéndolo: las dos cosas son verdad a la vez.
+  salio: 'La pieza ha salido con la esquina doblada. Nadie en el edificio lo ha notado.',
 };
 
 /* ─── posdatas ────────────────────────────────────────────────────────────
@@ -134,6 +162,7 @@ export const CONTRATO = {
     ['Artículos totales', 'procesadas'],
     ['Decisiones correctas', 'correctas'],
     ['Infracciones omitidas', 'omitidas'],
+    ['Adecuaciones solicitadas', 'rectificadas'],
     ['Precisión histórica', 'precision'],
   ],
 };

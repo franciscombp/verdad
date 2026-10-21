@@ -70,7 +70,7 @@ export const AUTORES = {
     nota: 'Convierte una fila del banco en una novela de tres capítulos.',
   },
   'sofia-mancheno': {
-    nombre: 'Sofía Manchero',
+    nombre: 'Sofía Mancheno',
     medio: 'latte',
     peso: 1,
     nota: 'Crítica cultural. Se le perdona todo mientras no cite una cifra.',

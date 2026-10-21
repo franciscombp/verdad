@@ -13,12 +13,12 @@
 import { MEDIOS, MEDIOS_MVP } from './medios.js';
 import { AUTORES } from './personajes.js';
 import { REGLAS, DIFICULTAD } from './reglas.js';
-import { CAMPANA, INICIO } from './campana.js';
+import { CAMPANA, INICIO, FILTRADOR } from './campana.js';
 import { PIEZAS } from './piezas.js';
 import { POSDATAS } from './textos.js';
 
 export const DATOS = {
-  MEDIOS, MEDIOS_MVP, AUTORES, REGLAS, DIFICULTAD, CAMPANA, INICIO, PIEZAS, POSDATAS,
+  MEDIOS, MEDIOS_MVP, AUTORES, REGLAS, DIFICULTAD, CAMPANA, INICIO, FILTRADOR, PIEZAS, POSDATAS,
   // Lo que dice la portada al pie. Sale de `ds/version.json`, que es copia
   // literal del repo del sistema, así que no se puede desviar.
   VERSION_DS: '1.0.15',

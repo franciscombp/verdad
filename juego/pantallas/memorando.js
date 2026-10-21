@@ -7,10 +7,14 @@
 // El sello de APROBADO no aprueba nada del jugador: aprueba el propio
 // memorando. Alguien, arriba, ha firmado que estas contradicciones son la
 // política informativa del país.
+//
+// Desde el Día 3, dentro de la misma carpeta, hay otro papel: una nota sin
+// membrete que pide dejar salir una pieza concreta. Va DEBAJO del memorando y
+// fuera del pliego, porque no es del Ministerio y no se escribió en su papel.
 // ============================================================================
 
 import { html, montar, chrome, membrete, sello } from '../ui/pintar.js';
-import { INTERFAZ } from '../../datos/textos.js';
+import { INTERFAZ, ENCARGO } from '../../datos/textos.js';
 
 export function memorando({ guion, reglas, alSeguir }) {
   montar(html`
@@ -38,6 +42,14 @@ export function memorando({ guion, reglas, alSeguir }) {
 
         ${sello('Aprobado', 'Oficina de censura', { flotante: true })}
       </article>
+
+      ${guion.encargo
+        ? html`<aside class="nota" aria-label="${ENCARGO.rotulo}">
+            <p class="nota__rotulo">${ENCARGO.rotulo}</p>
+            <p class="nota__texto">${guion.encargo.nota}</p>
+            <p class="nota__firma">— ${ENCARGO.firma}</p>
+          </aside>`
+        : ''}
 
       <div class="acciones">
         <button class="btn btn--rojo btn-block" type="button" id="seguir" data-avanzar>

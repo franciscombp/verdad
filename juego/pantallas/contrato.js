@@ -1,8 +1,8 @@
 // ============================================================================
 // FIN DE CONTRATO — la resolución
 // ============================================================================
-// Los dos finales, uno encendido y otro apagado, y el historial. Que se vea el
-// que NO tocó es deliberado: el jugador tiene que saber que había otra forma de
+// Los tres finales, uno encendido y dos apagados, y el historial. Que se vean
+// los que NO tocaron es deliberado: el jugador tiene que saber que había otra forma de
 // acabar esto, y no cuál era.
 // ============================================================================
 
@@ -10,12 +10,13 @@ import { html, montar, chrome, membrete, icono, medida } from '../ui/pintar.js';
 import { FINALES, CONTRATO } from '../../datos/textos.js';
 
 export function contrato({ resolucion, alReiniciar }) {
-  const orden = ['modelo', 'chivo'];
+  const orden = ['modelo', 'chivo', 'filtrador'];
   const datos = {
     dias: resolucion.dias,
     procesadas: resolucion.total.procesadas,
     correctas: resolucion.total.correctas,
     omitidas: resolucion.total.omitidas,
+    rectificadas: resolucion.total.rectificadas,
     precision: `${resolucion.precision} %`,
   };
 

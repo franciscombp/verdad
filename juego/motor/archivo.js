@@ -25,12 +25,13 @@ export function guardar(p) {
       conReloj: p.conReloj,
       dia: p.dia,
       gobierno: p.gobierno, pueblo: p.pueblo, estabilidad: p.estabilidad,
-      paranoia: p.paranoia, firmasBuencan: p.firmasBuencan,
+      paranoia: p.paranoia, firmasBuencan: p.firmasBuencan, filtradas: p.filtradas,
       historial: p.historial, total: p.total, despedido: p.despedido,
       jornada: j ? {
         i: j.i, sellos: j.sellos,
         procesadas: j.procesadas, correctas: j.correctas, omitidas: j.omitidas,
-        censuradas: j.censuradas, injustificadas: j.injustificadas, conflictos: j.conflictos,
+        censuradas: j.censuradas, rectificadas: j.rectificadas,
+        injustificadas: j.injustificadas, conflictos: j.conflictos, filtradas: j.filtradas,
         delta: j.delta,
       } : null,
     }));
@@ -59,6 +60,7 @@ export function restaurar(p, g, abrirDia) {
     dia: g.dia,
     gobierno: g.gobierno, pueblo: g.pueblo, estabilidad: g.estabilidad,
     paranoia: g.paranoia || 0, firmasBuencan: g.firmasBuencan || 0,
+    filtradas: g.filtradas || 0,
     historial: g.historial || [],
     // Un guardado de una versión anterior puede no traer un contador que hoy
     // existe. Mezclado sobre el que trae la partida nueva, lo que falte queda

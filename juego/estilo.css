@@ -360,6 +360,56 @@ body{
   font-variant-numeric: tabular-nums;
 }
 
+/* ─── la nota sin membrete ─────────────────────────────────────────────────
+   El encargo de R. Es papel, así que va en los colores del pliego, pero en el
+   tono de dentro —el recuadro— porque es papel peor: una hoja de libreta
+   arrancada y metida en la carpeta. Torcida, en cursiva y sin ningún rojo: lo
+   único rojo de esta pantalla es del Ministerio. */
+.nota{
+  margin: var(--mal-e5) var(--mal-e3) 0;
+  padding: var(--mal-e4);
+  background: var(--em-pliego-2);
+  color: var(--em-pliego-txt-2);
+  border-radius: var(--mal-r-s);
+  transform: rotate(-1.2deg);
+}
+.nota__rotulo{
+  font-family: var(--mal-mono);
+  font-size: var(--mal-t-mini);
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--em-pliego-meta);
+  margin: 0 0 var(--mal-e2);
+}
+.nota__texto{
+  font-family: var(--mal-texto);
+  font-style: italic;
+  font-size: var(--mal-t-cuerpo);
+  line-height: 1.5;
+  margin: 0;
+}
+.nota__firma{
+  font-family: var(--mal-texto);
+  font-style: italic;
+  text-align: right;
+  margin: var(--mal-e2) 0 0;
+}
+
+/* La esquina doblada, en la pieza. Un triángulo arriba a la derecha que deja
+   ver la mesa por detrás y el revés del papel por delante, y en el pie la
+   misma cosa dicha con palabras para quien no la vea. */
+.pliego--doblado::after{
+  content: "";
+  position: absolute; top: 0; right: 0;
+  width: 26px; height: 26px;
+  background: linear-gradient(225deg, var(--mal-bg) 50%, var(--em-pliego-linea) 50%);
+}
+.esquina{
+  display: inline-flex; align-items: center; gap: var(--mal-e1);
+  color: var(--em-pliego-txt-2);
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    EL SELLO DE CAUCHO
    ══════════════════════════════════════════════════════════════════════════

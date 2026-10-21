@@ -19,7 +19,7 @@
 // ============================================================================
 
 import { html, montar, chrome, subrayar, sello, icono } from '../ui/pintar.js';
-import { INTERFAZ } from '../../datos/textos.js';
+import { INTERFAZ, ENCARGO } from '../../datos/textos.js';
 import * as Partida from '../motor/partida.js';
 
 export function abrirEscritorio({ p, alDecidir }) {
@@ -41,6 +41,13 @@ export function abrirEscritorio({ p, alDecidir }) {
   const recordada = j.reglas[j.i % j.reglas.length];
   const nRecordada = (j.i % j.reglas.length) + 1;
 
+  // La esquina doblada se ve en el pie, donde se ve una esquina: no cambia el
+  // titular, no se subraya, no suena. El Ministerio pasa por delante de ella
+  // ocho horas al día y no la ha visto nunca.
+  const doblada = Partida.encargada(p);
+  const esquina = doblada
+    ? html`<span class="esquina">${icono('marcador', 'icono--s')} ${ENCARGO.esquina}</span>` : '';
+
   function pintar() {
     montar(expandido ? vistaExpandida() : vistaCompacta(), { ancha: expandido });
     engancharBotones();
@@ -54,7 +61,7 @@ export function abrirEscritorio({ p, alDecidir }) {
         ${chrome(Partida.hora(p), 'RED-CENSOR-V3.2')}
         ${barraTurno()}
 
-        <article class="pliego">
+        <article class="pliego ${doblada ? 'pliego--doblado' : ''}">
           <div class="pliego__cabecera">
             <span class="pliego__seccion">${pz.seccion} · ${medio.nombre}</span>
             <span class="pliego__fecha">Edición diaria</span>
@@ -64,7 +71,7 @@ export function abrirEscritorio({ p, alDecidir }) {
           <p class="pliego__texto" style="color:var(--em-pliego-meta)">Autor: ${autor.nombre}</p>
           <div class="pliego__pie">
             <span>${pz.expediente}</span>
-            <span>Pendiente</span>
+            ${doblada ? esquina : html`<span>Pendiente</span>`}
           </div>
         </article>
 
@@ -94,7 +101,7 @@ export function abrirEscritorio({ p, alDecidir }) {
           </button>
         </div>
 
-        <article class="pliego">
+        <article class="pliego ${doblada ? 'pliego--doblado' : ''}">
           <h1 class="pliego__titular" tabindex="-1" data-foco>${pz.titular}</h1>
           <div class="pliego__cabecera">
             <span class="pliego__seccion">${pz.seccion}</span>
@@ -103,6 +110,7 @@ export function abrirEscritorio({ p, alDecidir }) {
           ${pz.cuerpo.map((parrafo) => html`<p class="pliego__texto">${subrayar(parrafo, pz.marcas)}</p>`)}
           <div class="pliego__pie">
             <span>${medio.nombre}</span>
+            ${doblada ? esquina : ''}
             <span>${pz.expediente}</span>
           </div>
         </article>

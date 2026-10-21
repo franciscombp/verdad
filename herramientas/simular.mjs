@@ -6,7 +6,7 @@
 // El corrector (`revisar.mjs`) mira si el contenido está bien escrito. Esto mira
 // si el juego está bien BALANCEADO, que es otra cosa y no se ve leyendo.
 //
-// Juegan cinco perfiles y ninguno es un jugador real —los jugadores reales
+// Juegan siete perfiles y ninguno es un jugador real —los jugadores reales
 // aprenden—, pero entre los cinco acotan el campo:
 //
 //   obediente   sabe el memorando de memoria y no falla nunca. Es el techo:
@@ -22,6 +22,10 @@
 //               rectifica las contradicciones y, cuando se le acaban los
 //               sellos, adecúa en vez de dejar pasar. Debería acabar con MÁS
 //               apoyo popular que el obediente sin perder al Gobierno.
+//   filtrador   juega como el astuto y además deja salir todas las esquinas
+//               dobladas. Paga cada una como la omisión que es, y tiene que
+//               poder pagarlas: si el que mejor juega no llega al Final C, ese
+//               final es decorativo.
 //
 // LO QUE SE BUSCA. Que el obediente llegue al día 7 SIEMPRE, que el despistado
 // llegue a veces, que censurarlo todo se pague en la calle y que el astuto acabe
@@ -42,12 +46,19 @@ function aleatorio(semilla) {
   return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
 }
 
+// Los perfiles reciben `doblada`: si la pieza trae la esquina doblada. Solo
+// el filtrador la mira; para los demás es una pieza más.
 const PERFILES = {
   obediente: (dict) => (dict.contradiccion ? 'censurar' : dict.exige),
   // El único que juega el juego entero. `puede` dice si hoy se puede rectificar.
   astuto: (dict, dado, puede) => {
     if (dict.contradiccion) return puede ? 'rectificar' : 'censurar';
     if (dict.exige === 'censurar' && puede) return 'censurar';
+    return dict.exige;
+  },
+  filtrador: (dict, dado, puede, doblada) => {
+    if (doblada && dict.exige === 'censurar' && !dict.contradiccion) return 'aprobar';
+    if (dict.contradiccion) return puede ? 'rectificar' : 'censurar';
     return dict.exige;
   },
   tijeras: () => 'censurar',
@@ -75,10 +86,10 @@ function jugar(perfil, semilla) {
     while (Partida.pieza(p)) {
       const dict = dictamen(Partida.pieza(p), j.reglas);
       const adecuable = Partida.puedeRectificar(p);
-      let decision = PERFILES[perfil](dict, dado, adecuable);
+      let decision = PERFILES[perfil](dict, dado, adecuable, Partida.encargada(p));
       // Sin sellos no se puede censurar. El astuto adecúa; los demás no saben.
       if (decision === 'censurar' && !Partida.puedeCensurar(p)) {
-        decision = perfil === 'astuto' && adecuable ? 'rectificar' : 'aprobar';
+        decision = (perfil === 'astuto' || perfil === 'filtrador') && adecuable ? 'rectificar' : 'aprobar';
       }
       if (decision === 'rectificar' && !adecuable) decision = dict.exige || 'censurar';
       Partida.resolver(p, decision, false);
@@ -90,7 +101,7 @@ function jugar(perfil, semilla) {
 
 const resumen = {};
 for (const perfil of Object.keys(PERFILES)) {
-  const r = { modelo: 0, chivo: 0, despedidos: 0, dias: 0, precision: 0, gobierno: 0, pueblo: 0, adecuadas: 0 };
+  const r = { modelo: 0, chivo: 0, filtrador: 0, despedidos: 0, dias: 0, precision: 0, gobierno: 0, pueblo: 0, adecuadas: 0 };
   for (let i = 0; i < CUANTAS; i++) {
     const f = jugar(perfil, i + 1);
     r[f.id]++;
@@ -106,8 +117,8 @@ const pct = (n) => `${Math.round((n / CUANTAS) * 100)} %`;
 const med = (n) => (n / CUANTAS).toFixed(1);
 
 console.log(`${CUANTAS} contratos por perfil\n`);
-console.log('perfil       días  precisión  gobierno  pueblo  adecuadas  despedido  modelo   chivo');
-console.log('──────────────────────────────────────────────────────────────────────────────────────');
+console.log('perfil       días  precisión  gobierno  pueblo  adecuadas  despedido  modelo   chivo  filtra');
+console.log('──────────────────────────────────────────────────────────────────────────────────────────────');
 for (const [perfil, r] of Object.entries(resumen)) {
   console.log(
     perfil.padEnd(12) +
@@ -118,7 +129,8 @@ for (const [perfil, r] of Object.entries(resumen)) {
     med(r.adecuadas).padStart(11) +
     pct(r.despedidos).padStart(11) +
     pct(r.modelo).padStart(8) +
-    pct(r.chivo).padStart(8)
+    pct(r.chivo).padStart(8) +
+    pct(r.filtrador).padStart(8)
   );
 }
 
@@ -144,7 +156,14 @@ if (t.pueblo / CUANTAS > 30) fallos.push(`Censurarlo todo deja al pueblo en ${me
 const a = resumen.astuto;
 if (a.despedidos) fallos.push(`El astuto acaba despedido el ${pct(a.despedidos)} de las veces: el tercer verbo no puede castigar a quien lo usa bien.`);
 if (a.pueblo <= o.pueblo) fallos.push(`El astuto acaba con ${med(a.pueblo)} de apoyo popular y el obediente con ${med(o.pueblo)}: rectificar no está sirviendo de nada.`);
+// El Final C. Tiene que poder jugarse —el filtrador llega casi siempre— y no
+// puede llegarse por accidente: nadie que no mire las esquinas debería verlo.
+const f = resumen.filtrador;
+if (f.filtrador < CUANTAS * 0.8) fallos.push(`El filtrador solo llega al Final C el ${pct(f.filtrador)} de las veces: dejar salir las esquinas dobladas cuesta más de lo que se puede pagar.`);
+for (const [perfil, r] of Object.entries(resumen)) {
+  if (perfil !== 'filtrador' && r.filtrador) fallos.push(`«${perfil}» llega al Final C el ${pct(r.filtrador)} de las veces sin buscarlo.`);
+}
 
 console.log('');
 if (fallos.length) { fallos.forEach((f) => console.log(`BALANCE  ${f}`)); process.exit(1); }
-console.log('El balance cumple: el obediente sobrevive siempre, el despistado a veces, censurarlo todo se paga\ny quien usa el tercer verbo acaba mejor con la calle sin perder al Gobierno.');
+console.log('El balance cumple: el obediente sobrevive siempre, el despistado a veces, censurarlo todo se paga,\nquien usa el tercer verbo acaba mejor con la calle sin perder al Gobierno y el Final C se juega a propósito.');

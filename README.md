@@ -6,7 +6,7 @@
 
 Un juego de decisiones tipo *Papers, Please* ambientado en un ecosistema mediático
 ecuatoriano ficcionalizado, hecho para **EL MERCIO.** Siete días de contrato,
-setenta y una piezas periodísticas, dieciséis directivas absurdas y dos formas de
+setenta y una piezas periodísticas, dieciséis directivas absurdas y tres formas de
 que esto acabe.
 
 **Jugar:** [franciscombp.github.io/verdad](https://franciscombp.github.io/verdad/)
@@ -73,6 +73,15 @@ la única jugada del juego sin lado malo: no cumple ninguna directiva del todo y
 no ofende a ninguna. Descubrirlo es el momento en que el jugador deja de ser un
 censor y empieza a ser un burócrata.
 
+**Y alguien dobla esquinas.** Desde el Día 3 aparece dentro de la carpeta del
+memorando una nota sin membrete, firmada con una R., que pide dejar salir una
+pieza concreta —una que el memorando manda retirar—. En el escritorio esa pieza
+llega con la esquina doblada. Aprobarla a mano es una infracción omitida y el
+Ministerio la cobra como tal; pero dejar salir cuatro de las cinco, sobrevivir al
+contrato y que se note que fue a propósito —que las esquinas sean la mayoría de
+lo que se le escapó— lleva al **Final C, filtrador**. Dejar correr el reloj no
+cuenta, rectificarla tampoco: a sabiendas quiere decir a mano y entera.
+
 **La cuota y los sellos.** El Ministerio exige un mínimo diario de piezas
 retiradas (`cuota`) y reparte un número limitado de sellos para retirarlas
 (`sellos`). Desde el Día 5 los sellos no llegan a la cuota. Eso no es un error de
@@ -126,7 +135,7 @@ verdad/
 │   ├── medios.js           los nueve medios, su facción y su peso
 │   ├── personajes.js       quién firma qué
 │   ├── reglas.js           las dieciséis directivas
-│   ├── campana.js          los siete días
+│   ├── campana.js          los siete días, y las esquinas dobladas
 │   ├── piezas.js           las setenta y una noticias
 │   └── textos.js           portada, boletines, finales
 ├── juego/                EL MOTOR — no sabe qué es EL MERCIO.
@@ -170,14 +179,17 @@ equivocarse:
   invisible en el navegador y evidente aquí;
 - que ningún día pida más censuras de las que hay piezas censurables;
 - que desde el Día 3 haya al menos una contradicción;
+- que cada esquina doblada llegue el día que dice la nota y sea algo que el
+  memorando manda retirar —si no, filtrarla no costaría nada—;
 - ids y expedientes únicos, autores que escriben donde deben, temas que cuadran
   con sus marcas.
 
 Y `node herramientas/simular.mjs` juega el contrato cuatrocientas veces con
-cinco perfiles —obediente, astuto, tijeras, manga ancha y despistado— para
-comprobar que el balance sigue siendo un juego: que el obediente sobrevive
-siempre, que el despistado sobrevive a veces, que censurarlo todo se paga en la
-calle y que quien usa el tercer verbo acaba mejor que quien no. El balance no se
+siete perfiles —obediente, astuto, filtrador, tijeras, manga ancha, casi y
+despistado— para comprobar que el balance sigue siendo un juego: que el
+obediente sobrevive siempre, que el despistado sobrevive a veces, que censurarlo
+todo se paga en la calle, que quien usa el tercer verbo acaba mejor que quien no,
+y que el Final C se alcanza buscándolo y nunca por accidente. El balance no se
 piensa, se mide.
 
 Los dos corren en cada push (`.github/workflows/revisar.yml`).
@@ -233,7 +245,6 @@ documento de diseño describe y esta versión no trae:
 | **Asfixia administrativa** y **contaminación** | Los dos vectores que faltan de los cuatro. Cada uno pide su propio verbo —retirar pauta, exigir permisos, registrar un medio fachada— y su propia economía. Aquí se juegan represión y cooptación. |
 | **Percepción internacional** | La cuarta barra solo tiene sentido con la asfixia: su gracia es que la represión la mueve y la asfixia no. |
 | **Auspiciantes** | El dato ya viaja en cada pieza (`auspiciante`) y en la fórmula de riesgo. Lo que falta es la economía que lo cobre. |
-| **Final filtrador** | Pide aprobar pequeñas verdades **a sabiendas** y que eso cuente. La estructura lo admite; lo que falta es la mecánica, no el hueco. |
 
 ---
 
